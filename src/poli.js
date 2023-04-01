@@ -9,7 +9,7 @@ class SoundManager {
     add(name, src, count) {
         this.sounds[name] = [];
         for(let i = 0; i < count; i++) {
-            let sound = new Audio(src);
+            let sound = new Audio(`res/snd/${src}`);
             let key = `${name}...${i}`;
             this.loading.add(key);
             let onPlay = () => {
