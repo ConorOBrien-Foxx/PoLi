@@ -8,7 +8,8 @@ export class RegularGraph {
         this.r = r;
         this.vertexChangeDelay = vertexChangeDelay;
         this.hitsound = hitsound;
-        this.loopDuration = 3000;
+        // how long a total cycle takes
+        this.loopDuration = 3000;//ms
         // vertices of the main graph
         this.vertices = [];
         // the judgment line/dot
@@ -19,6 +20,8 @@ export class RegularGraph {
         };
         // initialize start values
         this.setVertices();
+        // state variable for pausing
+        this.savedElapsed = null;
         // temporary: get sounds to play
         this.lastBehind = null;
     }
@@ -75,6 +78,16 @@ export class RegularGraph {
         this.loopStart = Date.now();
     }
 
+    pause() {
+        // when we pause, we want to set our variables to be right for unpause
+        this.savedElapsed = Date.now() - this.loopStart;
+    }
+
+    unpause() {
+        this.loopStart = Date.now() - this.savedElapsed;
+        this.savedElapsed = null;
+    }
+
     interpolateJudge(interp) {
         // 0 <= interp < this.n
         let behindIndex = Math.floor(interp);
@@ -104,9 +117,8 @@ export class RegularGraph {
     }
     
     stopJudge() {
-        // TODO:
-        // LogicTweener.removeTween(this.judge, "position");
-        // FrameTweener.removeAllTweensFor(this.judge.vertex);
+        this.loopStart = null;
+        this.behindIndex = null;
     }
     
     step(now, elapsed) {

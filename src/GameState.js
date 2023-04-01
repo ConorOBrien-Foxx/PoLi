@@ -24,6 +24,18 @@ export class GameState {
         ];
     }
     
+    pause() {
+        for(let graph of this.graphs) {
+            graph.pause();
+        }
+    }
+
+    unpause() {
+        for(let graph of this.graphs) {
+            graph.unpause();
+        }
+    }
+
     addVertex(...args) {
         this.graphs[0].addVertex(...args);
     }

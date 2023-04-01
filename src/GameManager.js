@@ -12,8 +12,14 @@ export class GameManager {
         this.paused = false;
     }
     
-    pause() { this.paused = true; }
-    unpause() { this.paused = false; }
+    pause() {
+        this.paused = true;
+        this.state.pause();
+    }
+    unpause() {
+        this.paused = false;
+        this.state.unpause();
+    }
     
     clear() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);

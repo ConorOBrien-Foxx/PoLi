@@ -46,6 +46,18 @@ window.addEventListener("load", function() {
     });
     
     document.addEventListener("keydown", (ev) => {
+        if(ev.key === "p") {
+            // temporary
+            for(let graph of gm.state.graphs) {
+                graph.startJudge(0);
+            }
+        }
+        else if(ev.key === "o") {
+            for(let graph of gm.state.graphs) {
+                graph.stopJudge();
+            }
+        }
+        /*
         if(ev.key === "s") {
             gm.removeVertex();
         }
@@ -61,16 +73,7 @@ window.addEventListener("load", function() {
         else if("0" <= ev.key && ev.key <= "9") {
             gm.setVertexCount(parseInt(ev.key, 10));
         }
-        else if(ev.key === "p") {
-            // temporary
-            for(let graph of gm.state.graphs) {
-                graph.startJudge(0);
-            }
-        }
-        else if(ev.key === "o") {
-            for(let graph of gm.state.graphs) {
-                graph.stopJudge();
-            }
-        }
+        else ...
+        */
     });
 });
