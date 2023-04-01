@@ -25,10 +25,10 @@ window.addEventListener("load", function() {
         now = Date.now();
         elapsed = now - then;
         if(!gm.paused) {
-            FrameTweener.step(elapsed);
+            FrameTweener.step(now, elapsed);
         }
-        gm.step(elapsed);
-        gm.draw(elapsed);
+        gm.step(now, elapsed);
+        gm.draw(now, elapsed);
 
         then = now;
     };
@@ -58,7 +58,7 @@ window.addEventListener("load", function() {
             gm.addVertex(2);
         }
         else if("0" <= ev.key && ev.key <= "9") {
-            gm.setVertex(parseInt(ev.key, 10));
+            gm.setVertexCount(parseInt(ev.key, 10));
         }
         else if(ev.key === "p") {
             // temporary

@@ -30,13 +30,13 @@ export class GameState {
     removeVertex(...args) {
         this.graphs[0].removeVertex(...args);
     }
-    setVertex(...args) {
-        this.graphs[0].setVertex(...args);
+    setVertexCount(...args) {
+        this.graphs[0].setVertexCount(...args);
     }
     
-    step(deltaTime) {
+    step(now, elapsed) {
         for(let graph of this.graphs) {
-            graph.step(deltaTime);
+            graph.step(now, elapsed);
         }
     }
 }

@@ -19,15 +19,17 @@ export class GameManager {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     
-    step(deltaTime) {
-        if(this.paused) return;
-        LogicTweener.step(deltaTime);
-        this.state.step(deltaTime);
+    step(now, elapsed) {
+        if(this.paused) {
+            return;
+        }
+        LogicTweener.step(now, elapsed);
+        this.state.step(now, elapsed);
     }
     
     addVertex(...args) { this.state.addVertex(...args); }
     removeVertex(...args) { this.state.removeVertex(...args); }
-    setVertex(...args) { this.state.setVertex(...args); }
+    setVertexCount(...args) { this.state.setVertexCount(...args); }
     
     drawCircle(x, y, r) {
         // TODO: dot information?

@@ -18,7 +18,9 @@ export class RegularGraph {
             position: 0,//index in vertices
         };
         // initialize start values
-        this.poly();
+        this.setVertices();
+        // temporary: get sounds to play
+        this.lastBehind = null;
     }
     
     static polygonalVertices = (xc, yc, r, sides) => {
@@ -62,56 +64,55 @@ export class RegularGraph {
         this.snapVertex();
     }
     
-    setVertex(to) {
+    setVertexCount(to) {
         this.nextN = to;
         this.snapVertex();
     }
-    
+
     startJudge(at) {
         // TODO: abstract sound manager out into different class?
         // maybe emit custom events for abstraction
-        window.sm.play(this.hitsound);
-        if(at === 0) {
-            this.hitZero = +new Date();
+        this.loopStart = Date.now();
+    }
+
+    interpolateJudge(interp) {
+        // 0 <= interp < this.n
+        let behindIndex = Math.floor(interp);
+        this.behindIndex = behindIndex; // temporary: get sounds to play
+        let forwardIndex = this.getNextVertexPosition(behindIndex);
+        let behind = this.vertices[behindIndex];
+        let forward = this.vertices[forwardIndex];
+        let progress = interp % 1;
+        return [
+            behind[0] + (forward[0] - behind[0]) * progress,
+            behind[1] + (forward[1] - behind[1]) * progress,
+        ];
+    }
+
+    updateJudge(now) {
+        if(!this.loopStart) {
+            return;
         }
-        this.judge.position = at;
-        this.judge.vertex = [...this.vertices[at]];
-        let nextPosition = this.getNextVertexPosition(at);
-        // TODO: allow the judge to be stopped?
-        // does this already happen?
-        FrameTweener.addTween(
-            this.judge.vertex,
-            this.vertices[nextPosition],
-            this.judge.speed,
-        ).catch(reason => {
-            // pass: we've been terminated
-            if(reason !== TweenManager.RejectReason.Kill) {
-                console.error(reason);
-            }
-        });
-        LogicTweener.addTween(
-            this.judge,
-            { position: nextPosition },
-            this.judge.speed
-        ).then(() => {
-            this.startJudge(nextPosition);
-        }).catch(reason => {
-            // we've been terminated
-            // TODO: cleanup?
-            if(reason !== TweenManager.RejectReason.Kill) {
-                console.error(reason);
-            }
-        });
+        let oldBehind = this.behindIndex;
+        let elapsedSinceStart = now - this.loopStart; //ms
+        let interp = (elapsedSinceStart * this.n / this.loopDuration) % this.n;
+        this.judge.vertex = this.interpolateJudge(interp);
+        // temporary: get sounds to play
+        if(oldBehind !== this.behindIndex) {
+            window.sm.play(this.hitsound);
+        }
     }
     
     stopJudge() {
-        LogicTweener.removeTween(this.judge, "position");
-        FrameTweener.removeAllTweensFor(this.judge.vertex);
+        // TODO:
+        // LogicTweener.removeTween(this.judge, "position");
+        // FrameTweener.removeAllTweensFor(this.judge.vertex);
     }
     
-    step(deltaTime) {
+    step(now, elapsed) {
         this.n = this.nextN;
-        this.poly();
+        this.setVertices();
+        this.updateJudge(now);
     }
     
     /** helper methods **/
@@ -152,7 +153,7 @@ export class RegularGraph {
         });
     }
     
-    poly() {
+    setVertices() {
         // tweening: even-to-odd, map to same index
         // odd-toeven, map to next index
         if(this.n !== this.vertices.length) {

@@ -56,11 +56,11 @@ export class TweenManager {
         });
     }
     
-    step(deltaTime) {
-        // console.log(deltaTime);
+    step(now, elapsed) {
+        // console.log(elapsed);
         this.tweens = this.tweens.map(tween => {
             let { source, key, start, end, step, resolve } = tween;
-            source[key] += step * deltaTime;
+            source[key] += step * elapsed;
             const isAtEnd = Math.sign(source[key] - end) == Math.sign(step);
             if(isAtEnd) {
                 source[key] = end;
