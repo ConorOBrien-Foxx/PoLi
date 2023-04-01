@@ -15,7 +15,7 @@ export class RegularGraph {
         // the judgment line/dot
         this.judge = {
             vertex: [],//x,y
-            speed: this.loopDuration / this.n,//ms
+            //speed: this.loopDuration / this.n,//ms
             position: 0,//index in vertices
         };
         // initialize start values
@@ -131,6 +131,7 @@ export class RegularGraph {
     stopJudge() {
         this.loopStart = null;
         this.behindIndex = null;
+        this.judge.vertex = [];
     }
     
     step(now, elapsed) {

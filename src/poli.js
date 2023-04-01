@@ -9,16 +9,18 @@ let sm = new SoundManager();
 // sm.add("hit1", "./ting.wav", 3);
 // sm.add("hit2", "./ting-low.wav", 3);
 // sm.add("hit3", "./tut.wav", 3);
+// TODO: let maps load sounds
 sm.add("hit1", "./C5H_s.wav", 3);
 sm.add("hit2", "./E5H_s.wav", 3);
 sm.add("hit3", "./G5H_s.wav", 3);
+sm.add("hit4", "./B5H_s.wav", 3);
 sm.add("miss", "./miss.wav", 1);
 sm.ready().then(() => {
     console.log("Sounds loaded!");
 });
 window.sm = sm; //TODO: global, fix
 
-const readJsonFile = file => new Promise((resolve, reject) => {
+const readFileText = (file, mime="application/json") => new Promise((resolve, reject) => {
     let rawFile = new XMLHttpRequest();
     rawFile.overrideMimeType("application/json");
     rawFile.open("GET", file, true);
@@ -30,12 +32,24 @@ const readJsonFile = file => new Promise((resolve, reject) => {
     rawFile.send(null);
 });
 
+const readJSON = async (file) => {
+    let text = await readFileText(file);
+    return JSON.parse(text);
+}
+
 window.addEventListener("load", async function() {
     let gm = new GameManager(document.getElementById("game"));
     window.gm=gm;//debugging
 
-    let map1text = await readJsonFile("./src/map1.json");
-    let map1 = JSON.parse(map1text);
+    let map1 = await readJSON("./src/maps/test1.json");
+    let map2 = await readJSON("./src/maps/test2.json");
+    let map3 = await readJSON("./src/maps/test3.json");
+    let maps = [
+        map1,
+        map2,
+        map3,
+    ];
+
     gm.state.load(map1);
 
     let now, elapsed;
@@ -65,16 +79,16 @@ window.addEventListener("load", async function() {
     });
     
     document.addEventListener("keydown", (ev) => {
+        // temporary testing interface
         if(ev.key === "p") {
-            // temporary
-            for(let graph of gm.state.graphs) {
-                graph.startJudge(0);
-            }
+            gm.state.startJudges();
         }
         else if(ev.key === "o") {
-            for(let graph of gm.state.graphs) {
-                graph.stopJudge();
-            }
+            gm.state.stopJudges();
+        }
+        else if("1" <= ev.key && ev.key <= "9") {
+            gm.state.stopJudges();
+            gm.state.load(maps[ev.key - 1]);
         }
         /*
         if(ev.key === "s") {

@@ -29,11 +29,24 @@ export class GameState {
     addVertex(...args) {
         this.graphs[0].addVertex(...args);
     }
+
     removeVertex(...args) {
         this.graphs[0].removeVertex(...args);
     }
+
     setVertexCount(...args) {
         this.graphs[0].setVertexCount(...args);
+    }
+    
+    startJudges() {
+        for(let graph of this.graphs) {
+            graph.startJudge(0);
+        }
+    }
+    stopJudges() {
+        for(let graph of this.graphs) {
+            graph.stopJudge();
+        }
     }
     
     step(now, elapsed) {
