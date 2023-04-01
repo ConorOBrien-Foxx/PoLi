@@ -2,26 +2,16 @@ import { RegularGraph } from "./RegularGraph.js";
 
 export class GameState {
     constructor(vertexChangeDelay = 300) {
-        // TODO: abstract into graph type to support multiple graphs
         this.vertexChangeDelay = vertexChangeDelay;
-        this.graphs = [
-            new RegularGraph({
-                vertexChangeDelay,
-                xc: 200,
-                yc: 300,
-                r: 125,
-                n: 3,
-                hitsound: "hit2",
-            }),
-            new RegularGraph({
-                vertexChangeDelay,
-                xc: 500,
-                yc: 300,
-                r: 125,
-                n: 4,
-                hitsound: "hit1",
-            }),
-        ];
+        this.graphs = [];
+    }
+
+    load(json) {
+        this.vertexChangeDelay = json.vertexAnimate;
+        // this.???? = json.track
+        this.graphs = json.graphs.map(data =>
+            RegularGraph.fromJSON(data, this.vertexChangeDelay));
+        
     }
     
     pause() {

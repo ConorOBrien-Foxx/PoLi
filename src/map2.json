@@ -1,0 +1,27 @@
+{
+    "vertexAnimate": 300,
+    "track": "track",
+    "graphs": [
+        {
+            "center": [200, 300],
+            "radius": 125,
+            "sides": 3,
+            "hitsound": "hit2",
+            "loopDuration": 3000
+        },
+        {
+            "center": [500, 300],
+            "radius": 125,
+            "sides": 4,
+            "hitsound": "hit1",
+            "loopDuration": 3000
+        },
+        {
+            "center": [350, 500],
+            "radius": 80,
+            "sides": 5,
+            "hitsound": "hit3",
+            "loopDuration": 3000
+        }
+    ]
+}

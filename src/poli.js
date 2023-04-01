@@ -6,18 +6,37 @@ import { FrameTweener } from "./TweenManager.js";
 
 let sm = new SoundManager();
 // sm.add("hit", "./hit.wav", 3);
-sm.add("hit1", "./ting.wav", 3);
-// sm.add("hit2", "./tut.wav", 3);
-sm.add("hit2", "./ting-low.wav", 3);
+// sm.add("hit1", "./ting.wav", 3);
+// sm.add("hit2", "./ting-low.wav", 3);
+// sm.add("hit3", "./tut.wav", 3);
+sm.add("hit1", "./C5H_s.wav", 3);
+sm.add("hit2", "./E5H_s.wav", 3);
+sm.add("hit3", "./G5H_s.wav", 3);
 sm.add("miss", "./miss.wav", 1);
 sm.ready().then(() => {
     console.log("Sounds loaded!");
 });
 window.sm = sm; //TODO: global, fix
 
-window.addEventListener("load", function() {
+const readJsonFile = file => new Promise((resolve, reject) => {
+    let rawFile = new XMLHttpRequest();
+    rawFile.overrideMimeType("application/json");
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function() {
+        if (rawFile.readyState === 4 && rawFile.status == "200") {
+            resolve(rawFile.responseText);
+        }
+    }
+    rawFile.send(null);
+});
+
+window.addEventListener("load", async function() {
     let gm = new GameManager(document.getElementById("game"));
     window.gm=gm;//debugging
+
+    let map1text = await readJsonFile("./src/map1.json");
+    let map1 = JSON.parse(map1text);
+    gm.state.load(map1);
 
     let now, elapsed;
     const gameLoop = (/*timeStamp*/) => {

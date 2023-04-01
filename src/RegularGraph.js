@@ -1,7 +1,7 @@
 import { LogicTweener, FrameTweener } from "./TweenManager.js";
 
 export class RegularGraph {
-    constructor({ n, xc, yc, r, vertexChangeDelay, hitsound }) {
+    constructor({ n, xc, yc, r, vertexChangeDelay, hitsound, loopDuration }) {
         this.n = this.nextN = n;
         this.xc = xc;
         this.yc = yc;
@@ -9,7 +9,7 @@ export class RegularGraph {
         this.vertexChangeDelay = vertexChangeDelay;
         this.hitsound = hitsound;
         // how long a total cycle takes
-        this.loopDuration = 3000;//ms
+        this.loopDuration = loopDuration;//ms
         // vertices of the main graph
         this.vertices = [];
         // the judgment line/dot
@@ -41,7 +41,19 @@ export class RegularGraph {
         }
         
         return vertices;
-    };
+    }
+
+    static fromJSON(json, vertexChangeDelay) {
+        return new RegularGraph({
+            vertexChangeDelay,
+            n: json.sides,
+            xc: json.center[0],
+            yc: json.center[1],
+            r: json.radius,
+            hitsound: json.hitsound,
+            loopDuration: json.loopDuration,
+        })
+    }
     
     // make sure the vertex is in a valid bounds
     snapVertex() {
