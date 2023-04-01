@@ -1,0 +1,12 @@
+G  G  G  G  G  G  G  G  ;G4 <---
+F   F   F   F   F   F   ;F5 <---
+E     E     E     E     ;E4 <---
+C       C       C       ;C5 <---
+
+
+G  G              G  G  ;G4 <---
+F       F       F   F   ;F5 <---
+E                 E     ;E4 <---
+C       C       C       ;C5 <---
+
+// C, Eb, F, G, Bb, C

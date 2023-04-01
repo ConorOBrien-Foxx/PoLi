@@ -96,7 +96,9 @@ export class RegularGraph {
     }
 
     unpause() {
-        this.loopStart = Date.now() - this.savedElapsed;
+        if(this.loopStart) {
+            this.loopStart = Date.now() - this.savedElapsed;
+        }
         this.savedElapsed = null;
     }
 

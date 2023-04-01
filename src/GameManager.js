@@ -32,7 +32,13 @@ export class GameManager {
         LogicTweener.step(now, elapsed);
         this.state.step(now, elapsed);
     }
+
+    // game interface mechanics //
+    sendHit() {
+        this.gameState.sendHit();
+    }
     
+    // helper methods //
     addVertex(...args) { this.state.addVertex(...args); }
     removeVertex(...args) { this.state.removeVertex(...args); }
     setVertexCount(...args) { this.state.setVertexCount(...args); }

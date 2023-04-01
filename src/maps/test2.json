@@ -3,31 +3,31 @@
     "track": "track",
     "graphs": [
         {
-            "center": [150, 250],
-            "radius": 105,
-            "sides": 3,
-            "hitsound": "hit2",
-            "loopDuration": 2000
-        },
-        {
-            "center": [150, 450],
-            "radius": 125,
-            "sides": 4,
-            "hitsound": "hit1",
-            "loopDuration": 2000
-        },
-        {
             "center": [550, 250],
             "radius": 105,
             "sides": 3,
-            "hitsound": "hit3",
+            "hitsound": "c5",
             "loopDuration": 4000
         },
         {
             "center": [550, 450],
             "radius": 125,
             "sides": 4,
-            "hitsound": "hit4",
+            "hitsound": "e4",
+            "loopDuration": 4000
+        },
+        {
+            "center": [150, 250],
+            "radius": 95,
+            "sides": 6,
+            "hitsound": "f5",
+            "loopDuration": 4000
+        },
+        {
+            "center": [150, 450],
+            "radius": 85,
+            "sides": 8,
+            "hitsound": "g5",
             "loopDuration": 4000
         }
     ]

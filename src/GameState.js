@@ -11,7 +11,11 @@ export class GameState {
         // this.???? = json.track
         this.graphs = json.graphs.map(data =>
             RegularGraph.fromJSON(data, this.vertexChangeDelay));
-        
+    }
+
+    computeTargetHits() {
+        // compute the target hits for a single loop
+        // TODO:
     }
     
     pause() {
