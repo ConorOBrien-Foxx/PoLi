@@ -64,20 +64,18 @@ export class GameManager {
     drawFps(fps) {
         // draw fps over it all
         this.ctx.fillStyle = "#dddddd";
-        this.ctx.fillRect(0, 0, 270, 50);
+        this.ctx.fillRect(0, 0, 150, 50);
         this.ctx.font = "25px Arial";
         this.ctx.fillStyle = "black";
         let [ h1, h2 ] = this.state.graphs.map(e => e.hitZero);
         let diff = h2 - h1;
-        this.ctx.fillText("FPS: " + fps
-            + " | diff: " + diff + "ms", 10, 30);
-            // + " | N: " + this.state.graphs[0].n, 10, 30);
+        this.ctx.fillText("FPS: " + fps, 10, 30);
         this.ctx.fillStyle = "white";
     }
     
     // called once each frame
-    draw(deltaTime) {
-        let fps = Math.round(1000 / deltaTime);
+    draw(now, elapsed) {
+        let fps = Math.round(1000 / elapsed);
         // let fps = Math.round(100000 / deltaTime) / 100;
         this.clear();
         for(let graph of this.state.graphs) {
