@@ -4,6 +4,7 @@ export class SoundManager {
         this.loading = new Set();
         this.resolution = new Set();
         this.checkingReady = false;
+        this.isReady = false;
     }
     
     add(name, src, count) {

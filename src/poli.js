@@ -10,73 +10,33 @@ sm.add("hit1", "./ting.wav", 3);
 sm.add("hit2", "./tut.wav", 3);
 sm.add("miss", "./miss.wav", 1);
 sm.ready().then(() => {
-    // sm.play("hit");
+    console.log("Sounds loaded!");
 });
 window.sm = sm; //TODO: global, fix
 
 window.addEventListener("load", function() {
     let gm = new GameManager(document.getElementById("game"));
     window.gm=gm;//debugging
-    
-    // gm.draw(n);
-    let deltaTime, oldTimeStamp, fps;
-    let nextUpdate;
-    const updatesPerSecond = 25;
-    const skipTicks = 1000 / updatesPerSecond;
-    console.log(updatesPerSecond, skipTicks);
-    
-    // let fpsInterval = 1000 / 60; // 60fps
-    
-    // let then, startTime;
-    // let elapsed, now;
-    
-    const gameLoop = timeStamp => {
-        // console.log(timeStamp, "vs", Date.now());
+
+    let now, elapsed;
+    const gameLoop = (/*timeStamp*/) => {
         window.requestAnimationFrame(gameLoop);
-        
-        /*
-        
+
         now = Date.now();
         elapsed = now - then;
-        
-        if(elapsed > fpsInterval) {
-            then = now - (elapsed % fpsInterval);
-            // console.log(elapsed);
-            
-            FrameTweener.step(elapsed);
-            gm.step(elapsed);
-            gm.draw(elapsed);
-            
-        }
-        */
-        // /*
-        
-        if(!oldTimeStamp) {
-            oldTimeStamp = nextUpdate = timeStamp;
-            window.requestAnimationFrame(gameLoop);
-            return;
-        }
-        deltaTime = timeStamp - oldTimeStamp;
-        oldTimeStamp = timeStamp;
-        // step our logic
-        while(nextUpdate < timeStamp) {
-            gm.step(skipTicks);
-            nextUpdate += skipTicks;
-        }
-        // step our renderer
         if(!gm.paused) {
-            FrameTweener.step(deltaTime);
+            FrameTweener.step(elapsed);
         }
-        // draw
-        gm.draw(deltaTime);//deltaTime given for display
-        // */
+        gm.step(elapsed);
+        gm.draw(elapsed);
+
+        then = now;
     };
     
-    window.requestAnimationFrame(gameLoop);
-    // then = Date.now();
-    // startTime = then;
-    // gameLoop();
+    let then = Date.now();
+    gameLoop();
 
+    // interactivity features //
     window.addEventListener("focus", function() {
         gm.unpause();
     });
@@ -111,6 +71,5 @@ window.addEventListener("load", function() {
                 graph.stopJudge();
             }
         }
-        // sm.play("hit");
     });
 });
