@@ -7,7 +7,8 @@ import { FrameTweener } from "./TweenManager.js";
 let sm = new SoundManager();
 // sm.add("hit", "./hit.wav", 3);
 sm.add("hit1", "./ting.wav", 3);
-sm.add("hit2", "./tut.wav", 3);
+// sm.add("hit2", "./tut.wav", 3);
+sm.add("hit2", "./ting-low.wav", 3);
 sm.add("miss", "./miss.wav", 1);
 sm.ready().then(() => {
     console.log("Sounds loaded!");
