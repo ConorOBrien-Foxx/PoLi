@@ -30,8 +30,15 @@
             "radius": 250,
             "sides": 3,
             "hitsound": "g5",
-            "loopDuration": 5000
+            "loopDuration": 6000
         }
     ],
-    "events": []
+    "events": [
+        {
+            "condition": {
+                "loopCount": 2
+            },
+            "end": true
+        }
+    ]
 }
