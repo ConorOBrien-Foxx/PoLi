@@ -50,6 +50,39 @@
             "condition": {
                 "loopCount": 4
             },
+            "effects": [
+                {
+                    "hitsound": "f5",
+                    "newSides": 4
+                }
+            ]
+        },
+        {
+            "condition": {
+                "loopCount": 5
+            },
+            "effects": [
+                {
+                    "hitsound": "e5",
+                    "newSides": 3
+                }
+            ]
+        },
+        {
+            "condition": {
+                "loopCount": 6
+            },
+            "effects": [
+                {
+                    "hitsound": "c5",
+                    "newSides": 2
+                }
+            ]
+        },
+        {
+            "condition": {
+                "loopCount": 7
+            },
             "end": true
         }
     ]

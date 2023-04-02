@@ -318,8 +318,16 @@ export class GameState {
             // TODO: what if newSides == 0? probably doesn't matter
             if(effect.newSides) {
                 // TODO: pause the screen for a bit?
+                // TODO: fix for cases other than growing
+                let lastHitRecord = this.hitRecord.at(0);
+                let lastHasPlayed = this.hasPlayed.at(0);
+                console.log("Before:", this.hitRecord);
                 this.graphs[i].setVertexCountNow(now, effect.newSides);
                 this.applyComputeTargetHits();
+                console.log("After:", this.hitRecord);
+                this.hitRecord[0] = lastHitRecord;
+                this.hasPlayed[0] = lastHasPlayed;
+                console.log("After fix:", this.hitRecord);
             }
         });
     }
