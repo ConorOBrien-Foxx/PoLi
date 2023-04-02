@@ -91,6 +91,7 @@ window.addEventListener("load", async function() {
     window.addEventListener("resize", resizeGame);
     window.addEventListener("scroll", resizeGame);
 
+    const isInMenu = () => gameMenu.classList.contains("menuState");
     const focusOnGame = () => {
         gameMenu.querySelector(".onMenu").style.display = "none";
         gameMenu.querySelector(".onGame").style.display = "block";
@@ -109,14 +110,16 @@ window.addEventListener("load", async function() {
     window.gm=gm;//debugging
 
     let map1 = await readJSON("./src/maps/test1.json");
-    let map2 = await readJSON("./src/maps/test2.json");
-    let map3 = await readJSON("./src/maps/test3.json");
+    // let map2 = await readJSON("./src/maps/test2.json");
+    // let map3 = await readJSON("./src/maps/test3.json");
     let tutorial = await readJSON("./src/maps/tutorial.json");
+    let grow = await readJSON("./src/maps/grow.json");
     let maps = [
         tutorial,
+        grow,
         map1,
-        map2,
-        map3,
+        // map2,
+        // map3,
     ];
 
     gm.state.load(map1);
@@ -141,9 +144,11 @@ window.addEventListener("load", async function() {
 
     // interactivity features //
     window.addEventListener("focus", function() {
+        if(isInMenu()) return;
         gm.unpause();
     });
     window.addEventListener("blur", function() {
+        if(isInMenu()) return;
         gm.pause();
     });
 
@@ -152,18 +157,18 @@ window.addEventListener("load", async function() {
         gm.state.stopJudges();
         gm.state.load(maps[level]);
         gm.state.startJudges();
+        gm.unpause();
     };
+    // TODO: level IDs
+    // TODO: generic button behavior
     document.getElementById("startTutorial").addEventListener("click", function () {
         startLevel(0);
     });
-    document.getElementById("startLevel1").addEventListener("click", function () {
+    document.getElementById("startGrow").addEventListener("click", function () {
         startLevel(1);
     });
-    document.getElementById("startLevel2").addEventListener("click", function () {
+    document.getElementById("startThreeFour").addEventListener("click", function () {
         startLevel(2);
-    });
-    document.getElementById("startLevel3").addEventListener("click", function () {
-        startLevel(3);
     });
 
 

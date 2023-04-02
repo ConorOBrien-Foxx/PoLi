@@ -63,17 +63,10 @@ export class GameState {
         this.vertexChangeDelay = json.vertexAnimate;
         // this.???? = json.track
         this.events = json.events;
+        this.difficulty = json.difficulty;
         this.graphs = json.graphs.map(data =>
             RegularGraph.fromJSON(data, this.vertexChangeDelay));
-        let hitInfo =  this.computeTargetHits();
-        this.targets = hitInfo.targets;
-        this.totalDuration = hitInfo.duration;
-        this.stepOwners = hitInfo.owners;
-        this.difficulty = json.difficulty;
-        this.graphTargets = hitInfo.graphTargets;
-        // derived values
-        this.hitRecord = this.targets.map(() => HitState.Unhit);
-        this.hasPlayed = this.targets.map(() => false);
+        this.applyComputeTargetHits();
         /*
          * osu!'s hit window timings:
          * Score   Hit window (ms)
@@ -121,6 +114,17 @@ export class GameState {
             duration: totalDuration,
             graphTargets: graphTargets,
         };
+    }
+
+    applyComputeTargetHits() {
+        let hitInfo = this.computeTargetHits();
+        this.targets = hitInfo.targets;
+        this.totalDuration = hitInfo.duration;
+        this.stepOwners = hitInfo.owners;
+        this.graphTargets = hitInfo.graphTargets;
+        // derived values
+        this.hitRecord = this.targets.map(() => HitState.Unhit);
+        this.hasPlayed = this.targets.map(() => false);
     }
 
     addShadow(hitStamp, hitJudgment, owners) {
@@ -240,18 +244,6 @@ export class GameState {
             graph.unpause(this.loopStart);
         }
     }
-
-    addVertex(...args) {
-        this.graphs[0].addVertex(...args);
-    }
-
-    removeVertex(...args) {
-        this.graphs[0].removeVertex(...args);
-    }
-
-    setVertexCount(...args) {
-        this.graphs[0].setVertexCount(...args);
-    }
     
     countdown(n, rate=500) {
         return new Promise((resolve, reject) => {
@@ -274,6 +266,7 @@ export class GameState {
             return;
         }
         this.stopped = false;
+        this.finished = false;
         // set the start date in the future
         const rewindTime = 350;//ms
         // <dirty hack> to get a single update for viewers
@@ -317,10 +310,16 @@ export class GameState {
         this.loopCount++;
     }
 
-    applyEventEffect(effects) {
+    applyEventEffect(now, effects) {
         effects.forEach((effect, i) => {
             if(effect.hitsound) {
                 this.graphs[i].hitsound = effect.hitsound;
+            }
+            // TODO: what if newSides == 0? probably doesn't matter
+            if(effect.newSides) {
+                // TODO: pause the screen for a bit?
+                this.graphs[i].setVertexCountNow(now, effect.newSides);
+                this.applyComputeTargetHits();
             }
         });
     }
@@ -344,16 +343,18 @@ export class GameState {
         this.events = this.events.filter(event => {
             if(this.loopCount >= event?.condition?.loopCount) {
                 if(event.effects) {
-                    this.applyEventEffect(event.effects);
+                    this.applyEventEffect(now, event.effects);
                 }
                 if(event.end) {
                     // TODO: transition to end
+                    console.log("Finishing!");
                     this.finished = true;
                 }
                 return false;
             }
             return true;
         });
+        // TODO: for some reason, you can still overhit notes and this messes up counters
         // determine if a note too late to hit
         this.lastElapsed = elapsedSinceStart;
         this.targets.forEach((timing, i) => {

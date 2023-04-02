@@ -1,4 +1,5 @@
 {
+    "name": "Basic 3:4",
     "vertexAnimate": 300,
     "difficulty": 5,
     "track": "track",
@@ -16,6 +17,32 @@
             "sides": 4,
             "hitsound": "c5",
             "loopDuration": 3000
+        }
+    ],
+    "events": [
+        {
+            "condition": {
+                "loopCount": 2
+            },
+            "effects": [
+                { "hitsound": "e3" },
+                { "hitsound": "c3" }
+            ]
+        },
+        {
+            "condition": {
+                "loopCount": 4
+            },
+            "effects": [
+                { "hitsound": "e5" },
+                { "hitsound": "c5" }
+            ]
+        },
+        {
+            "condition": {
+                "loopCount": 6
+            },
+            "end": true
         }
     ]
 }

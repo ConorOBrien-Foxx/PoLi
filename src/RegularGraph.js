@@ -83,6 +83,12 @@ export class RegularGraph {
         this.snapVertex();
     }
 
+    setVertexCountNow(now, to) {
+        this.n = this.nextN = to;
+        this.setVertices();
+        this.updateJudge(now);
+    }
+
     startJudge(loopStart) {
         this.loopStart = loopStart;
     }

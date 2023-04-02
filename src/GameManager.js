@@ -12,14 +12,16 @@ export class GameManager {
         this.state = new GameState();
         this.paused = false;
         this.showMenu = showMenu;
-        this.fadeStart = null;
+        this.fadeOutStart = null;
     }
     
     pause() {
+        if(this.paused) return;
         this.paused = true;
         this.state.pause();
     }
     unpause() {
+        if(!this.paused) return;
         this.paused = false;
         this.state.unpause();
     }
@@ -34,13 +36,13 @@ export class GameManager {
             return;
         }
         LogicTweener.step(now, elapsed);
-        if(this.state.finished && !this.fadeStart) {
+        if(this.state.finished && !this.fadeOutStart) {
             // TODO: store score in local storage?
-            this.fadeStart = now;
+            this.fadeOutStart = now;
             console.log(this.state.hits, this.state.total);
         }
-        if(this.fadeStart && now - this.fadeStart > 2000) {
-            this.fadeStart = null;
+        if(this.fadeOutStart && now - this.fadeOutStart > 2000) {
+            this.fadeOutStart = null;
             this.pause();
             this.showMenu();
         }
@@ -50,6 +52,7 @@ export class GameManager {
 
     // game interface mechanics //
     sendHit(hitStamp) {
+        if(this.paused || this.state.finished) return;
         this.state.sendHit(hitStamp);
     }
     
@@ -124,8 +127,6 @@ export class GameManager {
 
     // called once each frame
     draw(now, elapsed) {
-        let fps = Math.round(1000 / elapsed);
-        // let fps = Math.round(100000 / deltaTime) / 100; // higher precision
         this.clear();
         for(let graph of this.state.graphs) {
             this.drawGraph(graph);
@@ -149,10 +150,12 @@ export class GameManager {
             this.ctx.fillStyle = "blue";
             im.drawSprite(this.ctx, "sprites", "cursor", ...graph.judge.vertex, 32, 32);
         }
+        // let fps = Math.round(1000 / elapsed);
+        // // let fps = Math.round(100000 / deltaTime) / 100; // higher precision
         // this.drawFps(fps);
         // draw fading
-        if(this.fadeStart) {
-            let alpha = Math.min(1, (now - this.fadeStart) / 2000);
+        if(this.fadeOutStart) {
+            let alpha = Math.min(1, (now - this.fadeOutStart) / 2000);
             this.ctx.globalAlpha = alpha;
             this.clear();
             this.ctx.globalAlpha = 1.0;

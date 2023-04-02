@@ -24,5 +24,6 @@
             "hitsound": "g5",
             "loopDuration": 5000
         }
-    ]
+    ],
+    "events": []
 }

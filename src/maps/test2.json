@@ -31,5 +31,6 @@
             "hitsound": "g5",
             "loopDuration": 4000
         }
-    ]
+    ],
+    "events": []
 }

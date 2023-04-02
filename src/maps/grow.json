@@ -1,0 +1,56 @@
+{
+    "name": "Growing Vertices",
+    "vertexAnimate": 300,
+    "difficulty": 5,
+    "track": "track",
+    "graphs": [
+        {
+            "center": [350, 350],
+            "radius": 105,
+            "sides": 2,
+            "hitsound": "c5",
+            "loopDuration": 3000
+        }
+    ],
+    "events": [
+        {
+            "condition": {
+                "loopCount": 1
+            },
+            "effects": [
+                {
+                    "hitsound": "e5",
+                    "newSides": 3
+                }
+            ]
+        },
+        {
+            "condition": {
+                "loopCount": 2
+            },
+            "effects": [
+                {
+                    "hitsound": "f5",
+                    "newSides": 4
+                }
+            ]
+        },
+        {
+            "condition": {
+                "loopCount": 3
+            },
+            "effects": [
+                {
+                    "hitsound": "g5",
+                    "newSides": 5
+                }
+            ]
+        },
+        {
+            "condition": {
+                "loopCount": 4
+            },
+            "end": true
+        }
+    ]
+}
