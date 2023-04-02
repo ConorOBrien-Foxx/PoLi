@@ -19,12 +19,12 @@ sm.add("g4", "G4H_s.wav", 2);
 sm.add("b4b", "As4H_Bb4H_s.wav", 2);
 sm.add("e4", "E4H_s.wav", 2);
 sm.add("count", "ting.wav", 3);
-sm.add("hit", "true-hit.wav", 3);
+sm.add("hit", "true-hit.wav", 390);
 // ALTERNATIVELY: E5b
 
 // C, Eb, F, G, Bb, C
 
-sm.add("miss", "./miss.wav", 1);
+sm.add("miss", "./miss.wav", 20);
 
 
 sm.ready().then(() => {
@@ -103,7 +103,7 @@ window.addEventListener("load", async function() {
             gm.state.stopJudges();
             gm.state.load(maps[ev.key - 1]);
         }
-        else if(HIT_KEYS.includes(ev.key)/* && !ev.repeat*/) {
+        else if(HIT_KEYS.includes(ev.key) && !ev.repeat) {
             // we don't want repeat keys
             let hitStamp = Date.now();
             gm.sendHit(hitStamp);

@@ -29,9 +29,9 @@ export class GameManager {
         if(this.paused) {
             return;
         }
-        sm.playQueue();
         LogicTweener.step(now, elapsed);
         this.state.step(now, elapsed);
+        sm.playQueue();
     }
 
     // game interface mechanics //
@@ -69,9 +69,6 @@ export class GameManager {
             this.ctx.font = "25px Arial";
             this.ctx.fillText("#" + i, x - 14, y + 10);
         });
-        // draw judge
-        this.ctx.fillStyle = "blue";
-        this.drawCircle(...graph.judge.vertex, 15);
     }
     
     drawFps(fps) {
@@ -105,6 +102,12 @@ export class GameManager {
         for(let { vertex, judgment } of this.state.shadows) {
             this.ctx.fillStyle = GameManager.HitStateColors[judgment];
             this.drawCircle(...vertex, 18);
+        }
+        // draw each judge
+        for(let graph of this.state.graphs) {
+            // draw judge
+            this.ctx.fillStyle = "blue";
+            this.drawCircle(...graph.judge.vertex, 15);
         }
         this.drawFps(fps);
     }

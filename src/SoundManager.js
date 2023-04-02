@@ -43,7 +43,8 @@ export class SoundManager {
     }
 
     queue(name) {
-        this.soundQueue.push(name);
+        this.play(name);
+        // this.soundQueue.push(name);
     }
     
     playQueue() {
@@ -54,7 +55,12 @@ export class SoundManager {
         // we might not want to queue non-musical sounds
         // like the player's hit/miss sounds, or at least
         // their miss sounds.
+        // UPDATE: still not sure why this happens. might
+        // not be related to the queue. strange.
         if(!this.soundQueue.length) return;
+        if(this.soundQueue.length > 2) {
+            console.log(this.soundQueue);
+        }
         for(let name of this.soundQueue) {
             this.play(name);
         }
@@ -62,11 +68,18 @@ export class SoundManager {
     }
 
     play(name) {
+        console.log(`Playing ${name}`)
         if(!this.sounds[name]) {
             throw new Error(`Could not find sound with name '${name}'`);
         }
         // console.log(this.sounds[name].filter(s=>!s.paused).length);
-        this.sounds[name].find(sound => sound.paused)?.play();
+        let sound = this.sounds[name].find(sound => sound.paused);
+        if(!sound) {
+            console.warn(`Could not find a playable sound for ${name}`);
+        }
+        else {
+            sound.play();
+        }
     }
     
     ready() {

@@ -22,8 +22,7 @@ export class RegularGraph {
         this.setVertices();
         // state variable for pausing
         this.savedElapsed = null;
-        // temporary: get sounds to play
-        this.lastBehind = null;
+        
     }
     
     static polygonalVertices = (xc, yc, r, sides) => {
@@ -100,7 +99,6 @@ export class RegularGraph {
     interpolateJudgeVertex(interp) {
         // 0 <= interp < this.n
         let behindIndex = Math.floor(interp);
-        this.behindIndex = behindIndex; // temporary: get sounds to play
         let forwardIndex = this.getNextVertexPosition(behindIndex);
         let behind = this.vertices[behindIndex];
         let forward = this.vertices[forwardIndex];
@@ -121,14 +119,8 @@ export class RegularGraph {
         if(!this.loopStart) {
             return;
         }
-        // temporary: get sounds to play
-        let oldBehind = this.behindIndex;
         let interp = this.interpolateTimeStamp(now);
         this.judge.vertex = this.interpolateJudgeVertex(interp);
-        // temporary: get sounds to play
-        if(oldBehind !== this.behindIndex) {
-            window.sm.queue(this.hitsound);
-        }
     }
     
     stopJudge() {
