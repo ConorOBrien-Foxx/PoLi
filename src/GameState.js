@@ -298,6 +298,6 @@ export class GameState {
                 }
             }
         });
-        this.shadows = this.shadows.filter(shadow => now - shadow.born < 1000);
+        this.shadows = this.shadows.filter(shadow => now - shadow.born < 1250);
     }
 }

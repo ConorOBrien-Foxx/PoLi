@@ -103,10 +103,16 @@ export class GameManager {
             this.drawGraph(graph);
         }
         // draw shadows
-        for(let { vertex, judgment, major } of this.state.shadows) {
+        for(let { vertex, judgment, major, born } of this.state.shadows) {
             let spriteName = GameManager.HitStateSprites[judgment];
+            // sprite sustain time at full opacity: 500ms
+            // fade-out time: 250ms
+            // total "animation" time: (sustain + fade-out) = 750ms
+            // TODO: parameterize this
+            let baseAlpha = Math.min(1, Math.max(0, 1 - (now - born - 500) / 750));
+            // console.log(baseAlpha);
             im.drawSprite(this.ctx, "sprites", spriteName, ...vertex, 48, 48, {
-                alpha: major ? 1 : 0.4
+                alpha: baseAlpha * (major ? 1 : 0.5),
             });
         }
         // draw each judge
