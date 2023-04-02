@@ -21,6 +21,7 @@ export class ImageManager {
     drawSprite(ctx, base, name, dx, dy, width, height, options) {
         options ??= {};
         options.centered ??= true;
+        options.alpha ??= 1.0;
         let spritesheet = this.spritesheets[base];
         let { x: spx, y: spy } = spritesheet.sprites[name];
 
@@ -29,10 +30,12 @@ export class ImageManager {
             dy -= height / 2;
         }
 
+        ctx.globalAlpha = options.alpha;
         ctx.drawImage(spritesheet.image,
             spx * spritesheet.resolution, spy * spritesheet.resolution,
             spritesheet.resolution, spritesheet.resolution,
             dx, dy, width, height
         );
+        ctx.globalAlpha = 1.0;
     }
 }

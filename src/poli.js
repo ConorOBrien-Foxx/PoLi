@@ -31,6 +31,10 @@ im.spritesheet("sprites", "sprites.png", {
 });
 im.sprite("sprites", "cursor", 0, 0);
 im.sprite("sprites", "node", 1, 0);
+im.sprite("sprites", "perfect", 0, 1);
+im.sprite("sprites", "good", 1, 1);
+im.sprite("sprites", "okay", 2, 1);
+im.sprite("sprites", "miss", 3, 1);
 
 // C, Eb, F, G, Bb, C
 

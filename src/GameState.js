@@ -103,18 +103,26 @@ export class GameState {
         });
         // TODO: we can probably use insertion sort
         targetHits.push(totalDuration);
+        stepOwners[totalDuration] = new Set(this.graphs.map((_, i) => i));
         // deduplicate
         targetHits = [...new Set(targetHits)];
         targetHits.sort((a, b) => a - b);
         return { owners: stepOwners, targets: targetHits, duration: totalDuration };
     }
 
-    addShadow(hitStamp, hitJudgment) {
-        for(let graph of this.graphs) {
+    addShadow(hitStamp, hitJudgment, owners) {
+        owners ??= new Set();
+
+        this.graphs.forEach((graph, i) => {
             let interp = graph.interpolateTimeStamp(hitStamp);
             let vertex = graph.interpolateJudgeVertex(interp);
-            this.shadows.push({ stamp: hitStamp, vertex, judgment: hitJudgment });
-        }
+            let major = true;
+            if(owners.size && !owners.has(i)) {
+                major = false;
+            }
+            console.log("Major:", major);
+            this.shadows.push({ stamp: hitStamp, vertex, judgment: hitJudgment, major });
+        });
     }
 
     sendHit(hitStamp) {
@@ -132,7 +140,7 @@ export class GameState {
         // judge the player's input
         let hitMarker = (hitStamp - this.loopStart) % this.totalDuration;
         let isHit = false;
-        let hitJudgment;
+        let hitJudgment, hitTiming;
         this.targets.forEach((timing, i) => {
             if(isHit) {
                 return;
@@ -141,16 +149,20 @@ export class GameState {
             let judgment = this.hitRecord[i];
             let isEarly = hitMarker < timing;
             // TODO: late/early judgment?
+            // TODO: make more readable/less redundant
             if(absDifference < this.timings[HitState.Perfect]) {
                 judgment = hitJudgment = HitState.Perfect;
+                hitTiming = timing;
                 isHit = true;
             }
             else if(absDifference < this.timings[HitState.Great]) {
                 judgment = hitJudgment = HitState.Great;
+                hitTiming = timing;
                 isHit = true;
             }
             else if(absDifference < this.timings[HitState.Okay]) {
                 judgment = hitJudgment = HitState.Okay;
+                hitTiming = timing;
                 isHit = true;
             }
             else if(isEarly && absDifference < this.timings[HitState.Miss]) {
@@ -167,9 +179,7 @@ export class GameState {
             sm.play("miss");
             hitJudgment = HitState.Miss;
         }
-        // for(let graph of this.graphs) {
-        this.addShadow(hitStamp, hitJudgment);
-        // }
+        this.addShadow(hitStamp, hitJudgment, this.stepOwners[hitTiming]);
     }
     
     pause() {
@@ -177,7 +187,6 @@ export class GameState {
         if(!this.loopStart) {
             return;
         }
-        console.log(this.loopStart);
         this.savedElapsed = Date.now() - this.loopStart;
         for(let graph of this.graphs) {
             graph.pause(this.savedElapsed);
@@ -243,8 +252,13 @@ export class GameState {
     }
     
     resetHitRecord() {
+        // copy over the last elements to the first (for wrapping around)
+        let lastHitRecord = this.targets.at(-1);
+        let lastHasPlayed = this.hasPlayed.at(-1);
         this.hitRecord = this.targets.map(() => HitState.Unhit);
+        this.hitRecord[0] = lastHitRecord;
         this.hasPlayed = this.targets.map(() => false);
+        this.hasPlayed[0] = lastHasPlayed;
     }
 
     step(now, elapsed) {

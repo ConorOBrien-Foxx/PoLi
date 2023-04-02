@@ -56,7 +56,8 @@ export class GameManager {
     
     drawGraph(graph) {
         this.ctx.beginPath();
-        this.ctx.strokeStyle = "black";
+        this.ctx.strokeStyle = "#fbe9ac";
+        this.ctx.lineWidth = 3;
         this.ctx.moveTo(...graph.vertices.at(-1));
         // draw the outline
         for(let [x, y] of graph.vertices) {
@@ -82,17 +83,15 @@ export class GameManager {
         this.ctx.fillRect(0, 0, 150, 50);
         this.ctx.font = "25px Arial";
         this.ctx.fillStyle = "black";
-        let [ h1, h2 ] = this.state.graphs.map(e => e.hitZero);
-        let diff = h2 - h1;
         this.ctx.fillText("FPS: " + fps, 10, 30);
         this.ctx.fillStyle = "white";
     }
     
-    static HitStateColors = {
-        [HitState.Perfect]: "blue",
-        [HitState.Great]: "orange",
-        [HitState.Okay]: "yellow",
-        [HitState.Miss]: "red",
+    static HitStateSprites = {
+        [HitState.Perfect]: "perfect",
+        [HitState.Great]: "good",
+        [HitState.Okay]: "okay",
+        [HitState.Miss]: "miss",
     };
 
     // called once each frame
@@ -104,19 +103,18 @@ export class GameManager {
             this.drawGraph(graph);
         }
         // draw shadows
-        for(let { vertex, judgment } of this.state.shadows) {
-            this.ctx.fillStyle = GameManager.HitStateColors[judgment];
-            this.drawCircle(...vertex, 18);
+        for(let { vertex, judgment, major } of this.state.shadows) {
+            let spriteName = GameManager.HitStateSprites[judgment];
+            im.drawSprite(this.ctx, "sprites", spriteName, ...vertex, 48, 48, {
+                alpha: major ? 1 : 0.4
+            });
         }
         // draw each judge
         for(let graph of this.state.graphs) {
             // draw judge
             this.ctx.fillStyle = "blue";
-            // this.drawCircle(...graph.judge.vertex, 15);
-            im.drawSprite(this.ctx, "sprites", "cursor", ...graph.judge.vertex, 32, 32, {
-                centered: true
-            });
+            im.drawSprite(this.ctx, "sprites", "cursor", ...graph.judge.vertex, 32, 32);
         }
-        this.drawFps(fps);
+        // this.drawFps(fps);
     }
 }

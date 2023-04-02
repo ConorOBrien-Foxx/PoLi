@@ -56,7 +56,6 @@ export class SoundManager {
     }
 
     play(name) {
-        console.log(`Playing ${name}`)
         if(!this.sounds[name]) {
             throw new Error(`Could not find sound with name '${name}'`);
         }
