@@ -64,13 +64,38 @@ const readJSON = async (file) => {
 };
 
 window.addEventListener("load", async function() {
-    let gm = new GameManager(document.getElementById("game"));
+    // dynamic width/height //
+    const gameHolder = document.getElementById("gameHolder");
+    const game = document.getElementById("game");
+    const gameMenu = document.getElementById("gameMenu");
+    const INTERNAL_PADDING = 50;
+    const resizeGame = () => {
+        let rect = gameHolder.getBoundingClientRect();
+        let height = document.body.clientHeight;
+        let target = height - rect.y - INTERNAL_PADDING;
+        target = Math.min(target, document.body.clientWidth - INTERNAL_PADDING);
+        game.style.height = `${target}px`;
+        game.style.width = `${target}px`;
+        gameMenu.style.height = `${target}px`;
+        gameMenu.style.width = `${target}px`;
+        let gameRect = game.getBoundingClientRect();
+        console.log(gameRect);
+        gameMenu.style.top = `${gameRect.top}px`;
+        gameMenu.style.left = `${gameRect.left}px`;
+    };
+    resizeGame();
+    window.addEventListener("resize", resizeGame);
+    window.addEventListener("scroll", resizeGame);
+
+    let gm = new GameManager(game);
     window.gm=gm;//debugging
 
     let map1 = await readJSON("./src/maps/test1.json");
     let map2 = await readJSON("./src/maps/test2.json");
     let map3 = await readJSON("./src/maps/test3.json");
+    let tutorial = await readJSON("./src/maps/tutorial.json");
     let maps = [
+        tutorial,
         map1,
         map2,
         map3,
@@ -104,42 +129,29 @@ window.addEventListener("load", async function() {
         gm.pause();
     });
 
-    // dynamic width/height //
-    const gameHolder = document.getElementById("gameHolder");
-    const game = document.getElementById("game");
-    const gameMenu = document.getElementById("gameMenu");
-    const INTERNAL_PADDING = 50;
-    const resizeGame = () => {
-        let rect = gameHolder.getBoundingClientRect();
-        let height = document.body.clientHeight;
-        let target = height - rect.y - INTERNAL_PADDING;
-        target = Math.min(target, document.body.clientWidth - INTERNAL_PADDING);
-        game.style.height = `${target}px`;
-        game.style.width = `${target}px`;
-        gameMenu.style.height = `${target}px`;
-        gameMenu.style.width = `${target}px`;
-        let gameRect = game.getBoundingClientRect();
-        console.log(gameRect);
-        gameMenu.style.top = `${gameRect.top}px`;
-        gameMenu.style.left = `${gameRect.left}px`;
-    };
-    resizeGame();
-    window.addEventListener("resize", resizeGame);
-
     const startLevel = level => {
         gameMenu.style.display = "none";
         gm.state.stopJudges();
         gm.state.load(maps[level]);
         gm.state.startJudges();
     };
-    document.getElementById("startLevel1").addEventListener("click", function () {
+    document.getElementById("startTutorial").addEventListener("click", function () {
         startLevel(0);
     });
-    document.getElementById("startLevel2").addEventListener("click", function () {
+    document.getElementById("startLevel1").addEventListener("click", function () {
         startLevel(1);
     });
-    document.getElementById("startLevel3").addEventListener("click", function () {
+    document.getElementById("startLevel2").addEventListener("click", function () {
         startLevel(2);
+    });
+    document.getElementById("startLevel3").addEventListener("click", function () {
+        startLevel(3);
+    });
+
+
+    game.addEventListener("touchstart", function(ev) {
+        let hitStamp = Date.now();
+        gm.sendHit(hitStamp);
     });
     
     const HIT_KEYS = "Tab q w e r t y u i o p [ ] \\ a s d f g h j k l ; ' Enter z x c v b n m , . /".split(" ");
@@ -154,40 +166,5 @@ window.addEventListener("load", async function() {
             let hitStamp = Date.now();
             gm.sendHit(hitStamp);
         }
-        // temporary testing interface
-        /*
-        if(ev.key === "p") {
-            gm.state.startJudges();
-        }
-        else if(ev.key === "o") {
-            gm.state.stopJudges();
-        }
-        else if("1" <= ev.key && ev.key <= "9") {
-            gm.state.stopJudges();
-            gm.state.load(maps[ev.key - 1]);
-        }
-        else if(HIT_KEYS.includes(ev.key) && !ev.repeat) {
-            // we don't want repeat keys
-            let hitStamp = Date.now();
-            gm.sendHit(hitStamp);
-        }*/
-        /*
-        if(ev.key === "s") {
-            gm.removeVertex();
-        }
-        else if(ev.key === "w") {
-            gm.addVertex();
-        }
-        else if(ev.key === "d") {
-            gm.removeVertex(2);
-        }
-        else if(ev.key === "e") {
-            gm.addVertex(2);
-        }
-        else if("0" <= ev.key && ev.key <= "9") {
-            gm.setVertexCount(parseInt(ev.key, 10));
-        }
-        else ...
-        */
     });
 });

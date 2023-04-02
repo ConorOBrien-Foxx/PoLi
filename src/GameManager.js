@@ -23,7 +23,7 @@ export class GameManager {
     }
     
     clear() {
-        this.ctx.fillStyle = "#121212";
+        this.ctx.fillStyle = "#151919";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
     

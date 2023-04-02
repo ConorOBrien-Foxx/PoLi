@@ -6,21 +6,32 @@
     <meta charset="UTF-8">
     <title>PiLo: A Polyrhythmic Game</title>
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-    
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik&display=swap');
+
     html, body {
         margin: 0;
         background: #1e325b;
         color: #e9d5c5;
+        font-family: "Rubik", sans-serif;
+        font-size: 20px;
     }
     body {
         min-height: 100vh;
     }
-    h1 {
+    h1, h2, h3, h4, h5, h6 {
         font-family: "Press Start 2P", Consolas, monospace;
-        text-align: center;
-        padding: 25px;
         margin: 0;
+    }
+    h1 {
+        text-align: center;
+        padding: 10px;
+        font-size: 30px;
+    }
+    h2 {
+        font-size: 26px;
+    }
+    p {
+        line-height: 1.6em;
     }
     #game {
         border: 2px solid;
@@ -42,7 +53,34 @@
         position: fixed;
         top: 0;
         left: 0;
-        background: black;
+        background: #121212;
+        /* padding: 15px; */
+    }
+
+    #levelSelect {
+        margin: 20px 0;
+    }
+
+    #levelSelect button {
+        width: 10ch;
+        height: 10ch;
+        border: 1px solid;
+        cursor: pointer;
+        background-color: #343434;
+        color: #dfdfdf;
+        margin: 5px;
+    }
+    #levelSelect button:hover {
+        background-color: #646464;
+    }
+
+    .large {
+        font-size: 36px;
+        padding: 10px;
+    }
+
+    #gameMenuContent {
+        padding: 30px;
     }
     
     </style>
@@ -56,9 +94,17 @@
         <canvas id="game"></canvas>
     </div>
     <div id="gameMenu">
-        <button id="startLevel1">Level 1</button>
-        <button id="startLevel2">Level 2</button>
-        <button id="startLevel3">Level 3</button>
+        <div id="gameMenuContent">
+            <h2>How to Play</h2>
+            <p>Tap along each time the Judge hits a corner of a shape! Tap one of the levels below to get started.</p>
+            <h2>Levels</h2>
+            <div id="levelSelect">
+                <button id="startTutorial"><span class="large">1</span><br/>1&star;</button>
+                <button id="startLevel1"><span class="large">2</span><br/>3&star;</button>
+                <button id="startLevel2"><span class="large">3</span><br/>10&star;</button>
+                <button id="startLevel3"><span class="large">4</span><br/>7&star;</button>
+            </div>
+        </div>
     </div>
 
 </body>
