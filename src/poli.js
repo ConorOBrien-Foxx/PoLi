@@ -187,13 +187,18 @@ window.addEventListener("load", async function() {
         focusOnMenu();
     });
 
-    const HIT_KEYS = "Tab q w e r t y u i o p [ ] \\ a s d f g h j k l ; ' Enter z x c v b n m , . /".split(" ");
+    const HIT_KEYS = [" ", ...(
+        "Tab q w e r t y u i o p [ ] \\ a s d f g h j k l "
+            + "; ' Enter z x c v b n m , . / "
+            + "ArrowLeft ArrowRight ArrowUp ArrowDown"
+    ).split(" ")];
     document.addEventListener("keydown", (ev) => {
         if(ev.key === "Escape") {
             gm.state.stopJudges();
             focusOnMenu();
         }
-        if(HIT_KEYS.includes(ev.key) && !ev.repeat) {
+        let key = ev.key.toLowerCase();
+        if(HIT_KEYS.includes(key) && !ev.repeat) {
             // we don't want repeat keys
             let hitStamp = Date.now();
             gm.sendHit(hitStamp);
