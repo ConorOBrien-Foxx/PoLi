@@ -83,7 +83,7 @@ window.addEventListener("load", async function() {
         gameMenu.style.height = `${target}px`;
         gameMenu.style.width = `${target}px`;
         let gameRect = game.getBoundingClientRect();
-        console.log(gameRect);
+        //console.log(gameRect);
         gameMenu.style.top = `${gameRect.top}px`;
         gameMenu.style.left = `${gameRect.left}px`;
     };
@@ -176,10 +176,12 @@ window.addEventListener("load", async function() {
         startLevel(3);
     });
 
-
-    game.addEventListener("touchstart", function(ev) {
-        let hitStamp = Date.now();
-        gm.sendHit(hitStamp);
+    // mobile input
+    window.addEventListener("touchstart", function(ev) {
+        if(ev.target === game || ev.target === gameMenu) {
+            let hitStamp = Date.now();
+            gm.sendHit(hitStamp);
+        }
     });
 
     document.getElementById("back").addEventListener("click", function () {
