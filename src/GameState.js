@@ -53,7 +53,8 @@ export class GameState {
         // state
         this.stopped = true;
         this.paused = false;
-        this.loopCount = 0;
+        this.finished = false;
+        this.loopCount = -1; //-1 because we start before
         this.hits = 0;
         this.total = 0;
     }
@@ -302,6 +303,7 @@ export class GameState {
         }
         this.shadows = [];
         this.hits = this.total = 0;
+        this.loopCount = -1;
     }
     
     resetHitRecord() {
@@ -312,6 +314,15 @@ export class GameState {
         this.hitRecord[0] = lastHitRecord;
         this.hasPlayed = this.hasPlayed.map(() => false);
         this.hasPlayed[0] = lastHasPlayed;
+        this.loopCount++;
+    }
+
+    applyEventEffect(effects) {
+        effects.forEach((effect, i) => {
+            if(effect.hitsound) {
+                this.graphs[i].hitsound = effect.hitsound;
+            }
+        });
     }
 
     step(now, elapsed) {
@@ -326,6 +337,23 @@ export class GameState {
         if(this.lastElapsed > elapsedSinceStart) {
             this.resetHitRecord();
         }
+        // exile old shadows
+        this.shadows = this.shadows.filter(shadow => now - shadow.born < 1250);
+        if(this.finished) return;
+        // apply loopCount events
+        this.events = this.events.filter(event => {
+            if(this.loopCount >= event?.condition?.loopCount) {
+                if(event.effects) {
+                    this.applyEventEffect(event.effects);
+                }
+                if(event.end) {
+                    // TODO: transition to end
+                    this.finished = true;
+                }
+                return false;
+            }
+            return true;
+        });
         // determine if a note too late to hit
         this.lastElapsed = elapsedSinceStart;
         this.targets.forEach((timing, i) => {
@@ -345,7 +373,6 @@ export class GameState {
                         let hitsound = this.graphs[ownerIndex].hitsound;
                         if(Array.isArray(hitsound)) {
                             let soundIndex = this.graphTargets[ownerIndex].indexOf(timing);
-                            console.log(soundIndex);
                             hitsound = hitsound[soundIndex];
                         }
                         sm.play(hitsound);
@@ -354,6 +381,5 @@ export class GameState {
                 }
             }
         });
-        this.shadows = this.shadows.filter(shadow => now - shadow.born < 1250);
     }
 }

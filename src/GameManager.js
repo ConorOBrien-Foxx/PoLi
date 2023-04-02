@@ -3,7 +3,7 @@ import { LogicTweener } from "./TweenManager.js";
 
 // this is our game's view (input and output)
 export class GameManager {
-    constructor(canvas) {
+    constructor(canvas, showMenu) {
         this.canvas = canvas;
         this.canvas.width = 700;
         this.canvas.height = 700;
@@ -11,6 +11,8 @@ export class GameManager {
         this.ctx.imageSmoothingEnabled = false; // for crisp pixels
         this.state = new GameState();
         this.paused = false;
+        this.showMenu = showMenu;
+        this.fadeStart = null;
     }
     
     pause() {
@@ -32,8 +34,18 @@ export class GameManager {
             return;
         }
         LogicTweener.step(now, elapsed);
+        if(this.state.finished && !this.fadeStart) {
+            // TODO: store score in local storage?
+            this.fadeStart = now;
+            console.log(this.state.hits, this.state.total);
+        }
+        if(this.fadeStart && now - this.fadeStart > 2000) {
+            this.fadeStart = null;
+            this.pause();
+            this.showMenu();
+        }
         this.state.step(now, elapsed);
-        sm.playQueue();
+        // sm.playQueue();
     }
 
     // game interface mechanics //
@@ -138,6 +150,13 @@ export class GameManager {
             im.drawSprite(this.ctx, "sprites", "cursor", ...graph.judge.vertex, 32, 32);
         }
         // this.drawFps(fps);
+        // draw fading
+        if(this.fadeStart) {
+            let alpha = Math.min(1, (now - this.fadeStart) / 2000);
+            this.ctx.globalAlpha = alpha;
+            this.clear();
+            this.ctx.globalAlpha = 1.0;
+        }
         this.drawAccuracy();
     }
 }

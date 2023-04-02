@@ -8,8 +8,31 @@
             "radius": 105,
             "sides": 4,
             "hitsound": ["c5", "e5", "b5", "g5"],
-            "loopDuration": 3000
+            "loopDuration": 1000
         }
     ],
-    "events": []
+    "events": [
+        {
+            "condition": {
+                "loopCount": 2
+            },
+            "effects": [
+                { "hitsound": ["c3", "e3", "b3", "g3"] }
+            ]
+        },
+        {
+            "condition": {
+                "loopCount": 4
+            },
+            "effects": [
+                { "hitsound": ["c5", "e5", "b5", "g5"] }
+            ]
+        },
+        {
+            "condition": {
+                "loopCount": 1
+            },
+            "end": true
+        }
+    ]
 }

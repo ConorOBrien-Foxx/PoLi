@@ -15,6 +15,10 @@ sm.add("c5", "C5H_s.wav", 2);
 sm.add("e5", "E5H_s.wav", 2);
 sm.add("g5", "G5H_s.wav", 2);
 sm.add("b5", "B5H_s.wav", 2);
+sm.add("c3", "C3H_s.wav", 2);
+sm.add("e3", "E3H_s.wav", 2);
+sm.add("g3", "G3H_s.wav", 2);
+sm.add("b3", "B3H_s.wav", 2);
 sm.add("f5", "F5H_s.wav", 2);
 sm.add("g4", "G4H_s.wav", 2);
 sm.add("b4b", "As4H_Bb4H_s.wav", 2);
@@ -87,7 +91,21 @@ window.addEventListener("load", async function() {
     window.addEventListener("resize", resizeGame);
     window.addEventListener("scroll", resizeGame);
 
-    let gm = new GameManager(game);
+    const focusOnGame = () => {
+        gameMenu.querySelector(".onMenu").style.display = "none";
+        gameMenu.querySelector(".onGame").style.display = "block";
+        gameMenu.classList.toggle("menuState");
+        // gameMenu.style.height = "1em";
+    };
+    const focusOnMenu = () => {
+        gameMenu.querySelector(".onMenu").style.display = "block";
+        gameMenu.querySelector(".onGame").style.display = "none";
+        gameMenu.classList.toggle("menuState");
+    };
+
+    let gm = new GameManager(game, () => {
+        focusOnMenu();
+    });
     window.gm=gm;//debugging
 
     let map1 = await readJSON("./src/maps/test1.json");
@@ -128,18 +146,6 @@ window.addEventListener("load", async function() {
     window.addEventListener("blur", function() {
         gm.pause();
     });
-
-    const focusOnGame = () => {
-        gameMenu.querySelector(".onMenu").style.display = "none";
-        gameMenu.querySelector(".onGame").style.display = "block";
-        gameMenu.classList.toggle("menuState");
-        // gameMenu.style.height = "1em";
-    };
-    const focusOnMenu = () => {
-        gameMenu.querySelector(".onMenu").style.display = "block";
-        gameMenu.querySelector(".onGame").style.display = "none";
-        gameMenu.classList.toggle("menuState");
-    };
 
     const startLevel = level => {
         focusOnGame();
