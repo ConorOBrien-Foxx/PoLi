@@ -120,7 +120,12 @@ export class GameState {
             if(owners.size && !owners.has(i)) {
                 major = false;
             }
-            this.shadows.push({ stamp: hitStamp, vertex, judgment: hitJudgment, major });
+            this.shadows.push({
+                vertex, major,
+                stamp: hitStamp,
+                judgment: hitJudgment,
+                born: Date.now(), 
+            });
         });
     }
 
@@ -252,11 +257,11 @@ export class GameState {
     
     resetHitRecord() {
         // copy over the last elements to the first (for wrapping around)
-        let lastHitRecord = this.targets.at(-1);
+        let lastHitRecord = this.hitRecord.at(-1);
         let lastHasPlayed = this.hasPlayed.at(-1);
-        this.hitRecord = this.targets.map(() => HitState.Unhit);
+        this.hitRecord = this.hitRecord.map(() => HitState.Unhit);
         this.hitRecord[0] = lastHitRecord;
-        this.hasPlayed = this.targets.map(() => false);
+        this.hasPlayed = this.hasPlayed.map(() => false);
         this.hasPlayed[0] = lastHasPlayed;
     }
 
@@ -278,7 +283,7 @@ export class GameState {
             if(this.hitRecord[i] === HitState.Unhit) {
                 if(elapsedSinceStart > timing + this.timings[HitState.Okay]) {
                     //console.log(elapsedSinceStart, timing, this.timings[HitState.Okay]);
-                    // this.addShadow(now, HitState.Miss);
+                    this.addShadow(this.loopStart + timing, HitState.Miss, this.stepOwners[timing]);
                     this.hitRecord[i] = HitState.Miss;
                     sm.play("miss");
                 }
@@ -293,7 +298,6 @@ export class GameState {
                 }
             }
         });
-        // TODO: fade
-        this.shadows = this.shadows.filter(shadow => now - shadow.stamp < 1000);
+        this.shadows = this.shadows.filter(shadow => now - shadow.born < 1000);
     }
 }
