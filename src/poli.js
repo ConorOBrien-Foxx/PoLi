@@ -188,9 +188,9 @@ window.addEventListener("load", async function() {
     });
 
     const HIT_KEYS = [" ", ...(
-        "Tab q w e r t y u i o p [ ] \\ a s d f g h j k l "
-            + "; ' Enter z x c v b n m , . / "
-            + "ArrowLeft ArrowRight ArrowUp ArrowDown"
+        "tab q w e r t y u i o p [ ] \\ a s d f g h j k l "
+            + "; ' enter z x c v b n m , . / "
+            + "arrowleft arrowright arrowup arrowdown"
     ).split(" ")];
     document.addEventListener("keydown", (ev) => {
         if(ev.key === "Escape") {
