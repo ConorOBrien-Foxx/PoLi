@@ -7,8 +7,9 @@
             "center": [350, 350],
             "radius": 105,
             "sides": 4,
-            "hitsound": "c5",
+            "hitsound": ["c5", "e5", "b5", "g5"],
             "loopDuration": 3000
         }
-    ]
+    ],
+    "events": []
 }

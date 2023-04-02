@@ -34,12 +34,8 @@ export class GameState {
         this.graphs = [];
         // the timings of the nodes of all the graphs
         this.targets = [];
-        // target hit array pattern:
-        //    unhit    n/a
-        //    miss      >90ms
-        //    okay      ±90ms
-        //    great     ±60ms
-        //    perfect   ±30ms
+        // the individual timings of each graph
+        this.graphTargets = [];
         this.hitRecord = [];
         // where the player has hit/missed
         this.shadows = [];
@@ -50,23 +46,30 @@ export class GameState {
         // the lockout (in ms) of when the player can press a key
         this.antiSpam = 150;
         this.lastHit = null;
+        // which events (if any) are present (sorted)
+        this.events = [];
         // various constants
         this.hitsoundOffset = 0;
         // state
         this.stopped = true;
         this.paused = false;
+        this.loopCount = 0;
+        this.hits = 0;
+        this.total = 0;
     }
 
     load(json) {
         this.vertexChangeDelay = json.vertexAnimate;
         // this.???? = json.track
+        this.events = json.events;
         this.graphs = json.graphs.map(data =>
             RegularGraph.fromJSON(data, this.vertexChangeDelay));
-        let hitInfo =  this.computeTargetHits()
+        let hitInfo =  this.computeTargetHits();
         this.targets = hitInfo.targets;
         this.totalDuration = hitInfo.duration;
         this.stepOwners = hitInfo.owners;
         this.difficulty = json.difficulty;
+        this.graphTargets = hitInfo.graphTargets;
         // derived values
         this.hitRecord = this.targets.map(() => HitState.Unhit);
         this.hasPlayed = this.targets.map(() => false);
@@ -93,6 +96,7 @@ export class GameState {
         let targetHits = [];
         let totalDuration = findLCM(this.graphs.map(graph => graph.loopDuration));
         let stepOwners = {};
+        let graphTargets = [];
         this.graphs.forEach((graph, gdx) => {
             let step = graph.loopDuration / graph.n;
             let hits = [];
@@ -102,6 +106,7 @@ export class GameState {
                 stepOwners[i].add(gdx);
             }
             targetHits.push(...hits);
+            graphTargets.push(hits);
         });
         // TODO: we can probably use insertion sort
         targetHits.push(totalDuration);
@@ -109,7 +114,12 @@ export class GameState {
         // deduplicate
         targetHits = [...new Set(targetHits)];
         targetHits.sort((a, b) => a - b);
-        return { owners: stepOwners, targets: targetHits, duration: totalDuration };
+        return {
+            owners: stepOwners,
+            targets: targetHits,
+            duration: totalDuration,
+            graphTargets: graphTargets,
+        };
     }
 
     addShadow(hitStamp, hitJudgment, owners) {
@@ -191,9 +201,16 @@ export class GameState {
         if(ignore) return;
         if(isHit) {
             sm.play("hit");
+            switch(hitJudgment) {
+                case HitState.Perfect:  this.hits += 3; break;
+                case HitState.Great:    this.hits += 2; break;
+                case HitState.Okay:     this.hits += 1; break;
+            }
+            this.total += 3;
         }
         else if(isMiss) {
             sm.play("miss");
+            this.total += 3;
         }
         if(hitJudgment && hitJudgment !== HitState.Unhit) {
             this.addShadow(hitStamp, hitJudgment, this.stepOwners[hitTiming]);
@@ -284,6 +301,7 @@ export class GameState {
             graph.stopJudge();
         }
         this.shadows = [];
+        this.hits = this.total = 0;
     }
     
     resetHitRecord() {
@@ -317,13 +335,20 @@ export class GameState {
                     this.addShadow(this.loopStart + timing, HitState.Miss, this.stepOwners[timing]);
                     this.hitRecord[i] = HitState.Miss;
                     sm.play("miss");
+                    this.total += 3;
                 }
             }
             if(!this.hasPlayed[i]) {
                 if(timing + this.hitsoundOffset < elapsedSinceStart) {
                     let owners = this.stepOwners[timing];
                     for(let ownerIndex of owners) {
-                        sm.play(this.graphs[ownerIndex].hitsound);
+                        let hitsound = this.graphs[ownerIndex].hitsound;
+                        if(Array.isArray(hitsound)) {
+                            let soundIndex = this.graphTargets[ownerIndex].indexOf(timing);
+                            console.log(soundIndex);
+                            hitsound = hitsound[soundIndex];
+                        }
+                        sm.play(hitsound);
                     }
                     this.hasPlayed[i] = true;
                 }

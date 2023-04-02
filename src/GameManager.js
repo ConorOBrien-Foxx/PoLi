@@ -86,6 +86,22 @@ export class GameManager {
         this.ctx.fillText("FPS: " + fps, 10, 30);
         this.ctx.fillStyle = "white";
     }
+
+    drawAccuracy() {
+        
+        // this.ctx.fillStyle = "#dddddd";
+        // this.ctx.fillRect(0, 0, 150, 50);
+        this.ctx.font = "25px 'Press Start 2P'";
+        this.ctx.fillStyle = "white";
+
+        let ratio = this.state.total ? this.state.hits / this.state.total : 0;
+        let rounded = Math.round(ratio * 10000) / 100;
+        let formatted = rounded.toString().padEnd("0", 5);
+        let text = formatted + "% " + this.state.hits + "/" + this.state.total;
+        this.ctx.textAlign = "right";
+        this.ctx.fillText(text, 690, 40);
+        this.ctx.textAlign = "left";
+    }
     
     static HitStateSprites = {
         [HitState.Perfect]: "perfect",
@@ -122,5 +138,6 @@ export class GameManager {
             im.drawSprite(this.ctx, "sprites", "cursor", ...graph.judge.vertex, 32, 32);
         }
         // this.drawFps(fps);
+        this.drawAccuracy();
     }
 }

@@ -129,8 +129,20 @@ window.addEventListener("load", async function() {
         gm.pause();
     });
 
+    const focusOnGame = () => {
+        gameMenu.querySelector(".onMenu").style.display = "none";
+        gameMenu.querySelector(".onGame").style.display = "block";
+        gameMenu.classList.toggle("menuState");
+        // gameMenu.style.height = "1em";
+    };
+    const focusOnMenu = () => {
+        gameMenu.querySelector(".onMenu").style.display = "block";
+        gameMenu.querySelector(".onGame").style.display = "none";
+        gameMenu.classList.toggle("menuState");
+    };
+
     const startLevel = level => {
-        gameMenu.style.display = "none";
+        focusOnGame();
         gm.state.stopJudges();
         gm.state.load(maps[level]);
         gm.state.startJudges();
@@ -153,13 +165,17 @@ window.addEventListener("load", async function() {
         let hitStamp = Date.now();
         gm.sendHit(hitStamp);
     });
-    
+
+    document.getElementById("back").addEventListener("click", function () {
+        gm.state.stopJudges();
+        focusOnMenu();
+    });
+
     const HIT_KEYS = "Tab q w e r t y u i o p [ ] \\ a s d f g h j k l ; ' Enter z x c v b n m , . /".split(" ");
-    // const NO_HIT_KEYS = ["Escape"];
     document.addEventListener("keydown", (ev) => {
         if(ev.key === "Escape") {
             gm.state.stopJudges();
-            gameMenu.style.display = "block";
+            focusOnMenu();
         }
         if(HIT_KEYS.includes(ev.key) && !ev.repeat) {
             // we don't want repeat keys

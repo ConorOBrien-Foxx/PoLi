@@ -53,29 +53,39 @@
         position: fixed;
         top: 0;
         left: 0;
-        background: #121212;
         /* padding: 15px; */
+    }
+    #gameMenu.menuState {
+        background: #121212;
     }
 
     #levelSelect {
         margin: 20px 0;
     }
 
-    #levelSelect button {
-        width: 10ch;
-        height: 10ch;
+    button {
         border: 1px solid;
         cursor: pointer;
         background-color: #343434;
         color: #dfdfdf;
+        font-family: "Rubik", sans-serif;
+    }
+    button:hover {
+        background-color: #646464;
+    }
+    #levelSelect button {
+        width: 10ch;
+        height: 10ch;
         margin: 5px;
     }
-    #levelSelect button:hover {
-        background-color: #646464;
+    .onGame button {
+        font-size: 20px;
+        padding: 10px;
     }
 
     .large {
         font-size: 36px;
+        font-family: "Press Start 2P", Consolas, monospace;
         padding: 10px;
     }
 
@@ -83,26 +93,49 @@
         padding: 30px;
     }
     
+    .perfect, .great, .okay, .miss {
+        font-weight: bold;
+    }
+    .perfect {
+        color: #36d0d2;
+    }
+    .great {
+        color: #36d25b;
+    }
+    .okay {
+        color: #d2d236;
+    }
+    .miss {
+        color: #d23636;
+    }
+    .onGame { display: none; }
+    /* TODO: optimize better on phones */
     </style>
 </head>
 <body>
 
     <header>
-        <h1>PiLo: A Polyrhythmic Game</h1>
+        <h1><span class="perfect">Pi</span><span class="miss">Lo</span>: A Polyrhythmic Game</h1>
     </header>
     <div id="gameHolder">
         <canvas id="game"></canvas>
     </div>
-    <div id="gameMenu">
+    <div id="gameMenu" class="menuState">
         <div id="gameMenuContent">
-            <h2>How to Play</h2>
-            <p>Tap along each time the Judge hits a corner of a shape! Tap one of the levels below to get started.</p>
-            <h2>Levels</h2>
-            <div id="levelSelect">
-                <button id="startTutorial"><span class="large">1</span><br/>1&star;</button>
-                <button id="startLevel1"><span class="large">2</span><br/>3&star;</button>
-                <button id="startLevel2"><span class="large">3</span><br/>10&star;</button>
-                <button id="startLevel3"><span class="large">4</span><br/>7&star;</button>
+            <div class="onGame">
+                <button id="back">Back</button>
+            </div>
+            <div class="onMenu">
+                <h2>How to Play</h2>
+                <p>Using your finger or any key, tap along each time the Judge hits a corner of a shape! Each <span class="perfect">Perfect (P!)</span> is worth 3 points, each <span class="great">Great (G.)</span> worth 2, and each <span class="okay">Okay (K&hellip;)</span> worth 1. Not hitting close enough, or forgetting to hit a note, will result in a <span class="miss">Miss (&varnothing;)</span> for 0 points.</p>
+                <p>Tap one of the levels below to get started.</p>
+                <h2>Levels</h2>
+                <div id="levelSelect">
+                    <button id="startTutorial"><span class="large">1</span><br/>1&star;</button>
+                    <button id="startLevel1"><span class="large">2</span><br/>3&star;</button>
+                    <button id="startLevel3"><span class="large">3</span><br/>7&star;</button>
+                    <button id="startLevel2"><span class="large">4</span><br/>10&star;</button>
+                </div>
             </div>
         </div>
     </div>
