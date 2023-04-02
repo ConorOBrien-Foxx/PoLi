@@ -103,7 +103,8 @@ window.addEventListener("load", async function() {
             gm.state.stopJudges();
             gm.state.load(maps[ev.key - 1]);
         }
-        else if(HIT_KEYS.includes(ev.key)) {
+        else if(HIT_KEYS.includes(ev.key)/* && !ev.repeat*/) {
+            // we don't want repeat keys
             let hitStamp = Date.now();
             gm.sendHit(hitStamp);
         }

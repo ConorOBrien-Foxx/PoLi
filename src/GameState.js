@@ -26,6 +26,7 @@ export const HitState = {
     Perfect:    Symbol("HitState.Perfect"),
 };
 
+
 export class GameState {
     constructor(vertexChangeDelay = 300) {
         this.vertexChangeDelay = vertexChangeDelay;
@@ -37,8 +38,11 @@ export class GameState {
         //    okay      ±90ms
         //    great     ±60ms
         //    perfect   ±30ms
-        this.targetHits = [];
+        this.hitRecord = [];
         this.shadows = [];
+        this.difficulty = 5;
+        this.antiSpam = 0;//50;
+        this.lastHit = null;
     }
 
     load(json) {
@@ -46,8 +50,28 @@ export class GameState {
         // this.???? = json.track
         this.graphs = json.graphs.map(data =>
             RegularGraph.fromJSON(data, this.vertexChangeDelay));
-        this.targets = this.computeTargetHits();
-        this.targetHits = this.targets.map(() => HitState.Unhit);
+        let hitInfo =  this.computeTargetHits()
+        this.targets = hitInfo.targets;
+        this.totalDuration = hitInfo.duration;
+        this.difficulty = json.difficulty;
+        // derived values
+        this.hitRecord = this.targets.map(() => HitState.Unhit);
+        /*
+         * osu!'s hit window timings:
+         * Score   Hit window (ms)
+         * 300     80 - 6 * OD
+         * 100     140 - 8 * OD
+         * 50      200 - 10 * OD
+         */
+        this.timings = {
+            [HitState.Perfect]: 80 - 6 * this.difficulty,
+            [HitState.Great]: 140 - 8 * this.difficulty,
+            [HitState.Okay]: 200 - 10 * this.difficulty,
+            [HitState.Miss]: 300,
+            // miss is anything else
+        };
+        this.lastElapsed = null;
+        console.log(this.timings);
     }
 
     computeTargetHits() {
@@ -68,21 +92,76 @@ export class GameState {
         // deduplicate
         targetHits = [...new Set(targetHits)];
         targetHits.sort((a, b) => a - b);
-        return targetHits;
+        return { targets: targetHits, duration: totalDuration };
     }
 
-    sendHit(hitStamp) {
-        let marker = hitStamp - this.loopStart;
-        sm.play("hit");
+    addShadow(hitStamp, hitJudgment) {
         for(let graph of this.graphs) {
             let interp = graph.interpolateTimeStamp(hitStamp);
             let vertex = graph.interpolateJudgeVertex(interp);
-            this.shadows.push(vertex);
+            this.shadows.push({ vertex, judgment: hitJudgment });
         }
+    }
+
+    sendHit(hitStamp) {
+        // TODO: reset loopStart on restart? and/or use mod
+        if(!this.loopStart) {
+            // do not accept hits if the game is not running
+            return;
+        }
+        if(this.lastHit && hitStamp - this.lastHit <= this.antiSpam) {
+            // do not accept hits too close to the last one
+            return;
+        }
+        console.log(this.lastHit,"then",hitStamp,"of",this.totalDuration);
+        this.lastHit = hitStamp;
+        let hitMarker = (hitStamp - this.loopStart) % this.totalDuration;
+        console.log(this.targets, this.hitRecord);
+        let isHit = false;
+        let hitJudgment;
+        this.targets.forEach((timing, i) => {
+            if(isHit) {
+                return;
+            }
+            let absDifference = Math.abs(timing - hitMarker);
+            let judgment = this.hitRecord[i];
+            let isEarly = hitMarker < timing;
+            // TODO: late/early judgment?
+            if(absDifference < this.timings[HitState.Perfect]) {
+                judgment = hitJudgment = HitState.Perfect;
+                isHit = true;
+            }
+            else if(absDifference < this.timings[HitState.Great]) {
+                judgment = hitJudgment = HitState.Great;
+                isHit = true;
+            }
+            else if(absDifference < this.timings[HitState.Okay]) {
+                judgment = hitJudgment = HitState.Okay;
+                isHit = true;
+            }
+            else if(isEarly && absDifference < this.timings[HitState.Miss]) {
+                judgment = HitState.Miss;
+            }
+            this.hitRecord[i] = judgment;
+        });
+        if(isHit) {
+            sm.queue("hit");
+        }
+        else {
+            sm.queue("miss");
+            hitJudgment = HitState.Miss;
+        }
+        // for(let graph of this.graphs) {
+        this.addShadow(hitStamp, hitJudgment);
+        // }
     }
     
     pause() {
         // when we pause, we want to set our variables to be right for unpause
+        if(!this.loopStart) {
+            return;
+        }
+        console.log(this.loopStart);
         this.savedElapsed = Date.now() - this.loopStart;
         for(let graph of this.graphs) {
             graph.pause(this.savedElapsed);
@@ -127,6 +206,9 @@ export class GameState {
     }
 
     startJudges() {
+        if(this.loopStart) {
+            return;
+        }
         this.countdown(3).then(() => {
             console.log("starting!");
             this.loopStart = Date.now();
@@ -141,11 +223,36 @@ export class GameState {
         for(let graph of this.graphs) {
             graph.stopJudge();
         }
+        this.shadows = [];
     }
     
+    resetHitRecord() {
+        this.hitRecord = this.targets.map(() => HitState.Unhit);
+    }
+
     step(now, elapsed) {
+        if(!this.loopStart) {
+            return;
+        }
         for(let graph of this.graphs) {
             graph.step(now, elapsed);
         }
+        // determine if too late to hit
+        let elapsedSinceStart = (now - this.loopStart) % this.totalDuration;
+        if(this.lastElapsed > elapsedSinceStart) {
+            this.resetHitRecord();
+        }
+        this.lastElapsed = elapsedSinceStart;
+        // console.log(elapsedSinceStart);
+        this.targets.forEach((timing, i) => {
+            if(this.hitRecord[i] === HitState.Unhit) {
+                if(elapsedSinceStart > timing + this.timings[HitState.Okay]) {
+                    //console.log(elapsedSinceStart, timing, this.timings[HitState.Okay]);
+                    this.addShadow(now, HitState.Miss);
+                    this.hitRecord[i] = HitState.Miss;
+                    sm.queue("miss");
+                }
+            }
+        })
     }
 }

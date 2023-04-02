@@ -127,7 +127,7 @@ export class RegularGraph {
         this.judge.vertex = this.interpolateJudgeVertex(interp);
         // temporary: get sounds to play
         if(oldBehind !== this.behindIndex) {
-            window.sm.play(this.hitsound);
+            window.sm.queue(this.hitsound);
         }
     }
     

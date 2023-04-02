@@ -1,5 +1,6 @@
 {
     "vertexAnimate": 300,
+    "difficulty": 5,
     "track": "track",
     "graphs": [
         {

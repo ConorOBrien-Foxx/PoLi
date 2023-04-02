@@ -5,6 +5,7 @@ export class SoundManager {
         this.resolution = new Set();
         this.checkingReady = false;
         this.isReady = false;
+        this.soundQueue = [];
     }
     
     add(name, src, count) {
@@ -40,7 +41,26 @@ export class SoundManager {
         }
         this.checkingReady = false;
     }
+
+    queue(name) {
+        this.soundQueue.push(name);
+    }
     
+    playQueue() {
+        // TODO: prioritize sounds playing in the queue
+        // sometimes, if two sounds are in the queue,
+        // one may overwrite the other?
+        // or maybe it's if too MANY are in the queue
+        // we might not want to queue non-musical sounds
+        // like the player's hit/miss sounds, or at least
+        // their miss sounds.
+        if(!this.soundQueue.length) return;
+        for(let name of this.soundQueue) {
+            this.play(name);
+        }
+        this.soundQueue.splice(0);
+    }
+
     play(name) {
         if(!this.sounds[name]) {
             throw new Error(`Could not find sound with name '${name}'`);

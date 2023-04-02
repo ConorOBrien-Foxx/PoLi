@@ -1,4 +1,4 @@
-import { GameState } from "./GameState.js";
+import { GameState, HitState } from "./GameState.js";
 import { LogicTweener } from "./TweenManager.js";
 
 // this is our game's view (input and output)
@@ -29,6 +29,7 @@ export class GameManager {
         if(this.paused) {
             return;
         }
+        sm.playQueue();
         LogicTweener.step(now, elapsed);
         this.state.step(now, elapsed);
     }
@@ -69,7 +70,7 @@ export class GameManager {
             this.ctx.fillText("#" + i, x - 14, y + 10);
         });
         // draw judge
-        this.ctx.fillStyle = "red";
+        this.ctx.fillStyle = "blue";
         this.drawCircle(...graph.judge.vertex, 15);
     }
     
@@ -85,6 +86,13 @@ export class GameManager {
         this.ctx.fillStyle = "white";
     }
     
+    static HitStateColors = {
+        [HitState.Perfect]: "blue",
+        [HitState.Great]: "orange",
+        [HitState.Okay]: "yellow",
+        [HitState.Miss]: "red",
+    };
+
     // called once each frame
     draw(now, elapsed) {
         let fps = Math.round(1000 / elapsed);
@@ -94,9 +102,9 @@ export class GameManager {
             this.drawGraph(graph);
         }
         // draw shadows
-        this.ctx.fillStyle = "green";
-        for(let shadow of this.state.shadows) {
-            this.drawCircle(...shadow, 18);
+        for(let { vertex, judgment } of this.state.shadows) {
+            this.ctx.fillStyle = GameManager.HitStateColors[judgment];
+            this.drawCircle(...vertex, 18);
         }
         this.drawFps(fps);
     }
