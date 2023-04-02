@@ -34,8 +34,8 @@ export class GameManager {
     }
 
     // game interface mechanics //
-    sendHit() {
-        this.gameState.sendHit();
+    sendHit(hitStamp) {
+        this.state.sendHit(hitStamp);
     }
     
     // helper methods //
@@ -88,10 +88,15 @@ export class GameManager {
     // called once each frame
     draw(now, elapsed) {
         let fps = Math.round(1000 / elapsed);
-        // let fps = Math.round(100000 / deltaTime) / 100;
+        // let fps = Math.round(100000 / deltaTime) / 100; // higher precision
         this.clear();
         for(let graph of this.state.graphs) {
             this.drawGraph(graph);
+        }
+        // draw shadows
+        this.ctx.fillStyle = "green";
+        for(let shadow of this.state.shadows) {
+            this.drawCircle(...shadow, 18);
         }
         this.drawFps(fps);
     }

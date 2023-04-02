@@ -7,14 +7,14 @@
             "radius": 105,
             "sides": 3,
             "hitsound": "e5",
-            "loopDuration": 2000
+            "loopDuration": 20000
         },
         {
             "center": [350, 450],
             "radius": 125,
             "sides": 4,
             "hitsound": "c5",
-            "loopDuration": 2000
+            "loopDuration": 20000
         }
     ]
 }

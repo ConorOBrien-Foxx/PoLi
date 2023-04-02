@@ -8,6 +8,9 @@ export class SoundManager {
     }
     
     add(name, src, count) {
+        if(this.sounds[name]) {
+            console.warn("Duplicate key: ", name);
+        }
         this.sounds[name] = [];
         for(let i = 0; i < count; i++) {
             let sound = new Audio(`res/snd/${src}`);

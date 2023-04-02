@@ -5,19 +5,21 @@ import { FrameTweener } from "./TweenManager.js";
 // TODO: RenderManager
 
 let sm = new SoundManager();
-// sm.add("hit", "./hit.wav", 3);
+// sm.add("hit", "./tut.wav", 3);
 // sm.add("hit1", "./ting.wav", 3);
 // sm.add("hit2", "./ting-low.wav", 3);
 // sm.add("hit3", "./tut.wav", 3);
 // TODO: let maps load sounds
-sm.add("c5", "./C5H_s.wav", 3);
-sm.add("e5", "./E5H_s.wav", 3);
-sm.add("g5", "./G5H_s.wav", 3);
-sm.add("b5", "./B5H_s.wav", 3);
-sm.add("f5", "./F5H_s.wav", 3);
-sm.add("g4", "./G4H_s.wav", 3);
-sm.add("b4b", "./As4H_Bb4H_s.wav", 3);
-sm.add("e4", "./E4H_s.wav", 3);
+sm.add("c5", "C5H_s.wav", 2);
+sm.add("e5", "E5H_s.wav", 2);
+sm.add("g5", "G5H_s.wav", 2);
+sm.add("b5", "B5H_s.wav", 2);
+sm.add("f5", "F5H_s.wav", 2);
+sm.add("g4", "G4H_s.wav", 2);
+sm.add("b4b", "As4H_Bb4H_s.wav", 2);
+sm.add("e4", "E4H_s.wav", 2);
+sm.add("count", "ting.wav", 3);
+sm.add("hit", "true-hit.wav", 3);
 // ALTERNATIVELY: E5b
 
 // C, Eb, F, G, Bb, C
@@ -102,7 +104,8 @@ window.addEventListener("load", async function() {
             gm.state.load(maps[ev.key - 1]);
         }
         else if(HIT_KEYS.includes(ev.key)) {
-            gm.sendHit();
+            let hitStamp = Date.now();
+            gm.sendHit(hitStamp);
         }
         /*
         if(ev.key === "s") {

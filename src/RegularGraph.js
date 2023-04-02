@@ -84,25 +84,20 @@ export class RegularGraph {
         this.snapVertex();
     }
 
-    startJudge(at) {
-        // TODO: abstract sound manager out into different class?
-        // maybe emit custom events for abstraction
-        this.loopStart = Date.now();
+    startJudge(loopStart) {
+        this.loopStart = loopStart;
     }
 
-    pause() {
-        // when we pause, we want to set our variables to be right for unpause
-        this.savedElapsed = Date.now() - this.loopStart;
+    pause(savedElapsed) {
+        this.savedElapsed = savedElapsed;
     }
 
-    unpause() {
-        if(this.loopStart) {
-            this.loopStart = Date.now() - this.savedElapsed;
-        }
+    unpause(loopStart) {
+        this.loopStart = loopStart;
         this.savedElapsed = null;
     }
 
-    interpolateJudge(interp) {
+    interpolateJudgeVertex(interp) {
         // 0 <= interp < this.n
         let behindIndex = Math.floor(interp);
         this.behindIndex = behindIndex; // temporary: get sounds to play
@@ -116,14 +111,20 @@ export class RegularGraph {
         ];
     }
 
+    interpolateTimeStamp(stamp) {
+        let elapsedSinceStart = stamp - this.loopStart; //ms
+        let interp = (elapsedSinceStart * this.n / this.loopDuration) % this.n;
+        return interp;
+    }
+
     updateJudge(now) {
         if(!this.loopStart) {
             return;
         }
+        // temporary: get sounds to play
         let oldBehind = this.behindIndex;
-        let elapsedSinceStart = now - this.loopStart; //ms
-        let interp = (elapsedSinceStart * this.n / this.loopDuration) % this.n;
-        this.judge.vertex = this.interpolateJudge(interp);
+        let interp = this.interpolateTimeStamp(now);
+        this.judge.vertex = this.interpolateJudgeVertex(interp);
         // temporary: get sounds to play
         if(oldBehind !== this.behindIndex) {
             window.sm.play(this.hitsound);
