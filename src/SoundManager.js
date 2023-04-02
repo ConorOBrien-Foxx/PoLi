@@ -42,11 +42,13 @@ export class SoundManager {
         this.checkingReady = false;
     }
 
+    // TODO: deprecate
     queue(name) {
         this.play(name);
         // this.soundQueue.push(name);
     }
     
+    // TODO: deprecate
     playQueue() {
         if(!this.soundQueue.length) return;
         for(let name of this.soundQueue) {

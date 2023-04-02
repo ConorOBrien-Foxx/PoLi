@@ -34,6 +34,16 @@
         flex-wrap: wrap;
         justify-content: center;
     }
+
+    #gameMenu {
+        border: 2px solid;
+        width: 300px;
+        height: 300px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: black;
+    }
     
     </style>
 </head>
@@ -44,6 +54,11 @@
     </header>
     <div id="gameHolder">
         <canvas id="game"></canvas>
+    </div>
+    <div id="gameMenu">
+        <button id="startLevel1">Level 1</button>
+        <button id="startLevel2">Level 2</button>
+        <button id="startLevel3">Level 3</button>
     </div>
 
 </body>

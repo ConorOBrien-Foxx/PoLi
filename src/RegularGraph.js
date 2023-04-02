@@ -112,6 +112,7 @@ export class RegularGraph {
     interpolateTimeStamp(stamp) {
         let elapsedSinceStart = stamp - this.loopStart; //ms
         let interp = (elapsedSinceStart * this.n / this.loopDuration) % this.n;
+        if(interp < 0) interp += this.n;
         return interp;
     }
 
@@ -130,6 +131,7 @@ export class RegularGraph {
     }
     
     step(now, elapsed) {
+        if(!this.loopStart) return;
         this.n = this.nextN;
         this.setVertices();
         this.updateJudge(now);

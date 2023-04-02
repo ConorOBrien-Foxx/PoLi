@@ -48,10 +48,13 @@ export class GameState {
         // how lenient the timing windows are
         this.difficulty = 5;
         // the lockout (in ms) of when the player can press a key
-        this.antiSpam = 50;
+        this.antiSpam = 150;
         this.lastHit = null;
         // various constants
         this.hitsoundOffset = 0;
+        // state
+        this.stopped = true;
+        this.paused = false;
     }
 
     load(json) {
@@ -78,11 +81,10 @@ export class GameState {
             [HitState.Perfect]: 80 - 6 * this.difficulty,
             [HitState.Great]: 140 - 8 * this.difficulty,
             [HitState.Okay]: 200 - 10 * this.difficulty,
+            // miss is anything else; this is used for late penatly
             [HitState.Miss]: 300,
-            // miss is anything else
         };
         this.lastElapsed = null;
-        console.log(this.timings);
     }
 
     computeTargetHits() {
@@ -144,9 +146,11 @@ export class GameState {
         // judge the player's input
         let hitMarker = (hitStamp - this.loopStart) % this.totalDuration;
         let isHit = false;
+        let isMiss = false;
+        let ignore = false;
         let hitJudgment, hitTiming;
         this.targets.forEach((timing, i) => {
-            if(isHit) {
+            if(isHit || isMiss || ignore) {
                 return;
             }
             let absDifference = Math.abs(timing - hitMarker);
@@ -158,32 +162,42 @@ export class GameState {
                 judgment = hitJudgment = HitState.Perfect;
                 hitTiming = timing;
                 isHit = true;
+                // console.log("perfect for vertex", i);
             }
             else if(absDifference < this.timings[HitState.Great]) {
                 judgment = hitJudgment = HitState.Great;
                 hitTiming = timing;
                 isHit = true;
+                // console.log("great for vertex", i);
             }
             else if(absDifference < this.timings[HitState.Okay]) {
                 judgment = hitJudgment = HitState.Okay;
                 hitTiming = timing;
                 isHit = true;
+                // console.log("okay for vertex", i);
             }
             else if(isEarly && absDifference < this.timings[HitState.Miss]) {
-                judgment = HitState.Miss;
+                judgment = hitJudgment = HitState.Miss;
+                isMiss = true;
             }
-            this.hitRecord[i] = judgment;
+            if(isHit && judgment !== this.hitRecord[i] && this.hitRecord[i] !== HitState.Unhit) {
+                // if we would write to a non-unhit judgment, just ignore it
+                ignore = true;
+            }
+            else {
+                this.hitRecord[i] = judgment;
+            }
         });
+        if(ignore) return;
         if(isHit) {
-            // sm.queue("hit");
             sm.play("hit");
         }
-        else {
-            // sm.queue("miss");
+        else if(isMiss) {
             sm.play("miss");
-            hitJudgment = HitState.Miss;
         }
-        this.addShadow(hitStamp, hitJudgment, this.stepOwners[hitTiming]);
+        if(hitJudgment && hitJudgment !== HitState.Unhit) {
+            this.addShadow(hitStamp, hitJudgment, this.stepOwners[hitTiming]);
+        }
     }
     
     pause() {
@@ -191,6 +205,7 @@ export class GameState {
         if(!this.loopStart) {
             return;
         }
+        this.paused = true;
         this.savedElapsed = Date.now() - this.loopStart;
         for(let graph of this.graphs) {
             graph.pause(this.savedElapsed);
@@ -201,6 +216,7 @@ export class GameState {
         if(this.loopStart) {
             this.loopStart = Date.now() - this.savedElapsed;
         }
+        this.paused = false;
         this.savedElapsed = null;
         for(let graph of this.graphs) {
             graph.unpause(this.loopStart);
@@ -222,12 +238,13 @@ export class GameState {
     countdown(n, rate=500) {
         return new Promise((resolve, reject) => {
             let step = n => {
+                if(this.stopped) return resolve(false);
                 if(n > 0) {
                     sm.play("count");
                     setTimeout(() => step(n - 1), rate);
                 }
                 else {
-                    resolve();
+                    resolve(true);
                 }
             };
             step(n);
@@ -238,9 +255,21 @@ export class GameState {
         if(this.loopStart) {
             return;
         }
-        this.countdown(3).then(() => {
-            console.log("starting!");
-            this.loopStart = Date.now();
+        this.stopped = false;
+        // set the start date in the future
+        const rewindTime = 350;//ms
+        // <dirty hack> to get a single update for viewers
+        this.loopStart = Date.now();
+        for(let graph of this.graphs) {
+            graph.loopStart = this.loopStart;
+            graph.updateJudge(this.loopStart - rewindTime);
+            graph.loopStart = null;
+        }
+        this.loopStart = null;
+        // </dirty hack>
+        this.countdown(3).then(isStarted => {
+            if(!isStarted) return;
+            this.loopStart = Date.now() + rewindTime;
             for(let graph of this.graphs) {
                 graph.startJudge(this.loopStart);
             }
@@ -249,6 +278,8 @@ export class GameState {
 
     stopJudges() {
         this.loopStart = null;
+        this.stopped = true;
+        this.paused = false;
         for(let graph of this.graphs) {
             graph.stopJudge();
         }
@@ -266,7 +297,7 @@ export class GameState {
     }
 
     step(now, elapsed) {
-        if(!this.loopStart) {
+        if(!this.loopStart || this.paused || this.stopped) {
             return;
         }
         for(let graph of this.graphs) {

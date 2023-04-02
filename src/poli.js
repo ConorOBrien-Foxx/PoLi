@@ -107,6 +107,7 @@ window.addEventListener("load", async function() {
     // dynamic width/height //
     const gameHolder = document.getElementById("gameHolder");
     const game = document.getElementById("game");
+    const gameMenu = document.getElementById("gameMenu");
     const INTERNAL_PADDING = 50;
     const resizeGame = () => {
         let rect = gameHolder.getBoundingClientRect();
@@ -115,13 +116,46 @@ window.addEventListener("load", async function() {
         target = Math.min(target, document.body.clientWidth - INTERNAL_PADDING);
         game.style.height = `${target}px`;
         game.style.width = `${target}px`;
+        gameMenu.style.height = `${target}px`;
+        gameMenu.style.width = `${target}px`;
+        let gameRect = game.getBoundingClientRect();
+        console.log(gameRect);
+        gameMenu.style.top = `${gameRect.top}px`;
+        gameMenu.style.left = `${gameRect.left}px`;
     };
     resizeGame();
     window.addEventListener("resize", resizeGame);
+
+    const startLevel = level => {
+        gameMenu.style.display = "none";
+        gm.state.stopJudges();
+        gm.state.load(maps[level]);
+        gm.state.startJudges();
+    };
+    document.getElementById("startLevel1").addEventListener("click", function () {
+        startLevel(0);
+    });
+    document.getElementById("startLevel2").addEventListener("click", function () {
+        startLevel(1);
+    });
+    document.getElementById("startLevel3").addEventListener("click", function () {
+        startLevel(2);
+    });
     
-    const HIT_KEYS = ["z", "x", "c", "v", "b", "n", "m"];
+    const HIT_KEYS = "Tab q w e r t y u i o p [ ] \\ a s d f g h j k l ; ' Enter z x c v b n m , . /".split(" ");
+    // const NO_HIT_KEYS = ["Escape"];
     document.addEventListener("keydown", (ev) => {
+        if(ev.key === "Escape") {
+            gm.state.stopJudges();
+            gameMenu.style.display = "block";
+        }
+        if(HIT_KEYS.includes(ev.key) && !ev.repeat) {
+            // we don't want repeat keys
+            let hitStamp = Date.now();
+            gm.sendHit(hitStamp);
+        }
         // temporary testing interface
+        /*
         if(ev.key === "p") {
             gm.state.startJudges();
         }
@@ -136,7 +170,7 @@ window.addEventListener("load", async function() {
             // we don't want repeat keys
             let hitStamp = Date.now();
             gm.sendHit(hitStamp);
-        }
+        }*/
         /*
         if(ev.key === "s") {
             gm.removeVertex();
