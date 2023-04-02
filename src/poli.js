@@ -176,13 +176,32 @@ window.addEventListener("load", async function() {
         startLevel(3);
     });
 
+    // TODO: check ancestors?
+    const isInputTarget = el =>
+        el === game || el === gameMenu;
     // mobile input
     window.addEventListener("touchstart", function(ev) {
-        if(ev.target === game || ev.target === gameMenu) {
+        if(isInputTarget(ev.target)) {
             let hitStamp = Date.now();
             gm.sendHit(hitStamp);
         }
     });
+    // allow click
+    window.addEventListener("click", (ev) => {
+        if(isInputTarget(ev.target)) {
+            let hitStamp = Date.now();
+            gm.sendHit(hitStamp);
+        }
+    });
+    window.addEventListener("contextmenu", (ev) => {
+        if(isInputTarget(ev.target)) {
+            ev.preventDefault();
+            let hitStamp = Date.now();
+            gm.sendHit(hitStamp);
+            return false;
+        }
+    });
+    
 
     document.getElementById("back").addEventListener("click", function () {
         gm.state.stopJudges();
