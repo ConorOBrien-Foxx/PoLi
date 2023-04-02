@@ -42,7 +42,7 @@ im.sprite("sprites", "miss", 3, 1);
 
 // C, Eb, F, G, Bb, C
 
-sm.add("miss", "./miss.wav", 2);
+sm.add("miss", "./miss.wav", 5);
 
 sm.ready().then(() => {
     console.log("Sounds loaded!");
@@ -114,10 +114,12 @@ window.addEventListener("load", async function() {
     // let map3 = await readJSON("./src/maps/test3.json");
     let tutorial = await readJSON("./src/maps/tutorial.json");
     let grow = await readJSON("./src/maps/grow.json");
+    let tri = await readJSON("./src/maps/tri.json");
     let maps = [
         tutorial,
         grow,
         map1,
+        tri,
         // map2,
         // map3,
     ];
@@ -169,6 +171,9 @@ window.addEventListener("load", async function() {
     });
     document.getElementById("startThreeFour").addEventListener("click", function () {
         startLevel(2);
+    });
+    document.getElementById("startTri").addEventListener("click", function () {
+        startLevel(3);
     });
 
 
