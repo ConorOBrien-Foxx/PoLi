@@ -48,19 +48,7 @@ export class SoundManager {
     }
     
     playQueue() {
-        // TODO: prioritize sounds playing in the queue
-        // sometimes, if two sounds are in the queue,
-        // one may overwrite the other?
-        // or maybe it's if too MANY are in the queue
-        // we might not want to queue non-musical sounds
-        // like the player's hit/miss sounds, or at least
-        // their miss sounds.
-        // UPDATE: still not sure why this happens. might
-        // not be related to the queue. strange.
         if(!this.soundQueue.length) return;
-        if(this.soundQueue.length > 2) {
-            console.log(this.soundQueue);
-        }
         for(let name of this.soundQueue) {
             this.play(name);
         }
@@ -72,10 +60,9 @@ export class SoundManager {
         if(!this.sounds[name]) {
             throw new Error(`Could not find sound with name '${name}'`);
         }
-        // console.log(this.sounds[name].filter(s=>!s.paused).length);
         let sound = this.sounds[name].find(sound => sound.paused);
         if(!sound) {
-            console.warn(`Could not find a playable sound for ${name}`);
+            console.warn(`Too many instances of ${name} playing at once to play another`);
         }
         else {
             sound.play();

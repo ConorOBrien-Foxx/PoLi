@@ -267,7 +267,7 @@ export class GameState {
                     //console.log(elapsedSinceStart, timing, this.timings[HitState.Okay]);
                     // this.addShadow(now, HitState.Miss);
                     this.hitRecord[i] = HitState.Miss;
-                    // sm.play("miss");
+                    sm.play("miss");
                 }
             }
             if(!this.hasPlayed[i]) {

@@ -8,6 +8,7 @@ export class GameManager {
         this.canvas.width = 700;
         this.canvas.height = 700;
         this.ctx = this.canvas.getContext("2d");
+        this.ctx.imageSmoothingEnabled = false; // for crisp pixels
         this.state = new GameState();
         this.paused = false;
     }
@@ -107,7 +108,10 @@ export class GameManager {
         for(let graph of this.state.graphs) {
             // draw judge
             this.ctx.fillStyle = "blue";
-            this.drawCircle(...graph.judge.vertex, 15);
+            // this.drawCircle(...graph.judge.vertex, 15);
+            im.drawSprite(this.ctx, "sprites", "cursor", ...graph.judge.vertex, 32, 32, {
+                centered: true
+            });
         }
         this.drawFps(fps);
     }

@@ -1,6 +1,7 @@
 import { SoundManager } from "./SoundManager.js";
 import { GameManager } from "./GameManager.js";
 import { FrameTweener } from "./TweenManager.js";
+import { ImageManager } from "./ImageManager.js";
 
 // TODO: RenderManager
 
@@ -19,18 +20,27 @@ sm.add("g4", "G4H_s.wav", 2);
 sm.add("b4b", "As4H_Bb4H_s.wav", 2);
 sm.add("e4", "E4H_s.wav", 2);
 sm.add("count", "ting.wav", 3);
-sm.add("hit", "true-hit.wav", 390);
+sm.add("hit", "true-hit.wav", 3);
 // ALTERNATIVELY: E5b
+
+let im = new ImageManager();
+im.spritesheet("sprites", "sprites.png", {
+    resolution: 16,
+    width: 16,
+    height: 16,
+});
+im.sprite("sprites", "cursor", 0, 0);
+im.sprite("sprites", "blue", 2, 1);
 
 // C, Eb, F, G, Bb, C
 
-sm.add("miss", "./miss.wav", 20);
-
+sm.add("miss", "./miss.wav", 2);
 
 sm.ready().then(() => {
     console.log("Sounds loaded!");
 });
 window.sm = sm; //TODO: global, fix
+window.im = im; //TODO: global, fix
 
 const readFileText = (file, mime="application/json") => new Promise((resolve, reject) => {
     let rawFile = new XMLHttpRequest();
