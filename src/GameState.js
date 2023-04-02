@@ -120,7 +120,6 @@ export class GameState {
             if(owners.size && !owners.has(i)) {
                 major = false;
             }
-            console.log("Major:", major);
             this.shadows.push({ stamp: hitStamp, vertex, judgment: hitJudgment, major });
         });
     }

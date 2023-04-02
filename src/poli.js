@@ -103,6 +103,21 @@ window.addEventListener("load", async function() {
     window.addEventListener("blur", function() {
         gm.pause();
     });
+
+    // dynamic width/height //
+    const gameHolder = document.getElementById("gameHolder");
+    const game = document.getElementById("game");
+    const INTERNAL_PADDING = 50;
+    const resizeGame = () => {
+        let rect = gameHolder.getBoundingClientRect();
+        let height = document.body.clientHeight;
+        let target = height - rect.y - INTERNAL_PADDING;
+        target = Math.min(target, document.body.clientWidth - INTERNAL_PADDING);
+        game.style.height = `${target}px`;
+        game.style.width = `${target}px`;
+    };
+    resizeGame();
+    window.addEventListener("resize", resizeGame);
     
     const HIT_KEYS = ["z", "x", "c", "v", "b", "n", "m"];
     document.addEventListener("keydown", (ev) => {

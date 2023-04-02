@@ -3,17 +3,48 @@
 <head>
 
     <script type="module" src="./src/poli.js"></script>
+    <meta charset="UTF-8">
+    <title>PiLo: A Polyrhythmic Game</title>
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
     
+    html, body {
+        margin: 0;
+        background: #1e325b;
+        color: #e9d5c5;
+    }
+    body {
+        min-height: 100vh;
+    }
+    h1 {
+        font-family: "Press Start 2P", Consolas, monospace;
+        text-align: center;
+        padding: 25px;
+        margin: 0;
+    }
     #game {
         border: 2px solid;
+        height: 300px;
+        width: 300px;
+        margin: 15px;
+    }
+
+    #gameHolder {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
     }
     
     </style>
 </head>
 <body>
 
-<canvas id="game"></canvas>
+    <header>
+        <h1>PiLo: A Polyrhythmic Game</h1>
+    </header>
+    <div id="gameHolder">
+        <canvas id="game"></canvas>
+    </div>
 
 </body>
 </html>
