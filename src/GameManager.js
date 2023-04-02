@@ -23,7 +23,8 @@ export class GameManager {
     }
     
     clear() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillStyle = "#121212";
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
     
     step(now, elapsed) {
@@ -64,11 +65,14 @@ export class GameManager {
         this.ctx.stroke();
         // draw each dot
         graph.vertices.forEach(([x, y], i) => {
+            im.drawSprite(this.ctx, "sprites", "node", x, y, 48, 48);
+            /*
             this.ctx.fillStyle = "white";
             this.drawCircle(x, y, 20);
             this.ctx.fillStyle = "black";
             this.ctx.font = "25px Arial";
             this.ctx.fillText("#" + i, x - 14, y + 10);
+            */
         });
     }
     

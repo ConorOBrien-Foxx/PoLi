@@ -30,7 +30,7 @@ im.spritesheet("sprites", "sprites.png", {
     height: 16,
 });
 im.sprite("sprites", "cursor", 0, 0);
-im.sprite("sprites", "blue", 2, 1);
+im.sprite("sprites", "node", 1, 0);
 
 // C, Eb, F, G, Bb, C
 
@@ -57,7 +57,7 @@ const readFileText = (file, mime="application/json") => new Promise((resolve, re
 const readJSON = async (file) => {
     let text = await readFileText(file);
     return JSON.parse(text);
-}
+};
 
 window.addEventListener("load", async function() {
     let gm = new GameManager(document.getElementById("game"));
