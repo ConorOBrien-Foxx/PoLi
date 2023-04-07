@@ -1,6 +1,6 @@
 {
-    "name": "Growing Vertices",
-    "vertexAnimate": 300,
+    "name": "Even More Growing Vertices",
+    "vertexAnimate": 200,
     "difficulty": 5,
     "track": "track",
     "graphs": [
@@ -15,9 +15,11 @@
                 3,  4,  5,
                 6,  7,  8,  9,
                 10, 11, 12, 13, 14,
-                15, 16, 17, 18,
-                19, 20, 21,
-                22, 23, 24
+                15, 16, 17, 18, 19, 20,
+                21, 22, 23, 24, 25,
+                26, 27, 28, 29,
+                30, 31, 32,
+                33, 34, 35
             ]
         }
     ],
@@ -61,6 +63,28 @@
             },
             "effects": [
                 {
+                    "hitSound": "a5",
+                    "newSides": 6
+                }
+            ]
+        },
+        {
+            "condition": {
+                "totalNotesPlayed": 21
+            },
+            "effects": [
+                {
+                    "hitSound": "g5",
+                    "newSides": 5
+                }
+            ]
+        },
+        {
+            "condition": {
+                "totalNotesPlayed": 26
+            },
+            "effects": [
+                {
                     "hitSound": "f5",
                     "newSides": 4
                 }
@@ -68,7 +92,7 @@
         },
         {
             "condition": {
-                "totalNotesPlayed": 19
+                "totalNotesPlayed": 30
             },
             "effects": [
                 {
@@ -79,7 +103,7 @@
         },
         {
             "condition": {
-                "totalNotesPlayed": 22
+                "totalNotesPlayed": 33
             },
             "effects": [
                 {

@@ -14,6 +14,7 @@ let sm = new SoundManager();
 sm.add("c5", "C5H_s.wav", 2);
 sm.add("e5", "E5H_s.wav", 2);
 sm.add("g5", "G5H_s.wav", 2);
+sm.add("a5", "A5H_s.wav", 2);
 sm.add("b5", "B5H_s.wav", 2);
 sm.add("c3", "C3H_s.wav", 2);
 sm.add("e3", "E3H_s.wav", 2);
@@ -114,10 +115,12 @@ window.addEventListener("load", async function() {
     // let map3 = await readJSON("./src/maps/test3.json");
     let tutorial = await readJSON("./src/maps/tutorial.json");
     let grow = await readJSON("./src/maps/grow.json");
+    let grow2 = await readJSON("./src/maps/grow2.json");
     let tri = await readJSON("./src/maps/tri.json");
     let maps = [
         tutorial,
         grow,
+        grow2,
         map1,
         tri,
         // map2,
@@ -169,11 +172,14 @@ window.addEventListener("load", async function() {
     document.getElementById("startGrow").addEventListener("click", function () {
         startLevel(1);
     });
-    document.getElementById("startThreeFour").addEventListener("click", function () {
+    document.getElementById("startGrow2").addEventListener("click", function () {
         startLevel(2);
     });
-    document.getElementById("startTri").addEventListener("click", function () {
+    document.getElementById("startThreeFour").addEventListener("click", function () {
         startLevel(3);
+    });
+    document.getElementById("startTri").addEventListener("click", function () {
+        startLevel(43);
     });
 
     // TODO: check ancestors?
@@ -206,6 +212,10 @@ window.addEventListener("load", async function() {
     document.getElementById("back").addEventListener("click", function () {
         gm.state.stopJudges();
         focusOnMenu();
+    });
+
+    document.getElementById("pause").addEventListener("click", function () {
+        gm.state.togglePause();
     });
 
     const HIT_KEYS = [" ", ...(

@@ -59,7 +59,7 @@ export class GameState {
         // this.loopCount = -1; //-1 because we start before
         this.hits = 0;
         this.total = 0;
-        this.notePlayed = 0;
+        this.totalNotesPlayed = 0;
     }
 
     load(json) {
@@ -94,55 +94,65 @@ export class GameState {
         let duration = null;
         let graphTargets = [];
 
-        // for now, assume 1 graph
-        let gdx = 0;
-        let graph = this.graphs[gdx];
-        let step = graph.loopDuration / graph.n;
-        let hits = graph.hitNotes.map(note => note * step);
-        for(let hit of hits) {
-            stepOwners[hit] ??= new Set();
-            stepOwners[hit].add(gdx);
-        }
-        hitTargets.push(...hits);
-        graphTargets.push(hits);
-        duration = Math.max(...hits) + BEFORE_AFTER_PADDING;
-        console.log(hitTargets);
+        this.graphs.forEach((graph, gdx) => {
+            // obtain hit segments
+            let newSideChanges = this.events
+                .filter(event => event?.condition?.totalNotesPlayed)
+                .map(event => ({
+                    newSides: event.effects[gdx]?.newSides,
+                    totalNotesPlayed: event.condition.totalNotesPlayed,
+                }))
+                .filter(({ newSides }) => newSides);
+            
+            let sideRuns = [
+                graph.n,
+                ...newSideChanges.map(({ newSides }) => newSides)
+            ].map((sides, i) => {
+                let lastIndex = newSideChanges[i - 1]?.totalNotesPlayed ?? 0;
+                let currentIndex = newSideChanges[i]?.totalNotesPlayed ?? graph.hitNotes.length;
+                let count = currentIndex - lastIndex;
+                // TODO: is graph.loopDuration the correct numerator?
+                let step = graph.loopDuration / sides;
+                return { sides, step, count };
+            });
+            console.log(sideRuns);
+            // TODO: floating point error, somehow?
+            
+            // to start our counting at 1
+            // this seems like a hack
+            let lastTimeStamp = -sideRuns[0].step;
+            let hits = [];
+            for(let { sides, step, count } of sideRuns) {
+                for(let i = 1; i <= count; i++) {
+                    let stamp = lastTimeStamp + step * i;
+                    hits.push(stamp);
+                }
+                lastTimeStamp = hits.at(-1);
+            }
+
+            for(let hit of hits) {
+                stepOwners[hit] ??= new Set();
+                stepOwners[hit].add(gdx);
+            }
+            hitTargets.push(...hits);
+            graphTargets.push(hits);
+            duration = Math.max(...hits) + BEFORE_AFTER_PADDING;
+            console.log(hitTargets);
+        });
+
+        // TODO: we can probably use insertion sort
+        // hitTargets.push(totalDuration);
+        // stepOwners[totalDuration] = new Set(this.graphs.map((_, i) => i));
+        // deduplicate
+        hitTargets = [...new Set(hitTargets)];
+        hitTargets.sort((a, b) => a - b);
+
         return {
             owners: stepOwners,
             targets: hitTargets,
             duration: duration,
             graphTargets: graphTargets,
         };
-        /*
-        // compute the target hits for a single loop
-        // TODO:
-        let targetHits = [];
-        let totalDuration = findLCM(this.graphs.map(graph => graph.loopDuration));
-        let stepOwners = {};
-        let graphTargets = [];
-        this.graphs.forEach((graph, gdx) => {
-            let step = graph.loopDuration / graph.n;
-            let hits = [];
-            for(let i = 0; i < totalDuration; i += step) {
-                hits.push(i);
-                stepOwners[i] ??= new Set();
-                stepOwners[i].add(gdx);
-            }
-            targetHits.push(...hits);
-            graphTargets.push(hits);
-        });
-        // TODO: we can probably use insertion sort
-        targetHits.push(totalDuration);
-        stepOwners[totalDuration] = new Set(this.graphs.map((_, i) => i));
-        // deduplicate
-        targetHits = [...new Set(targetHits)];
-        targetHits.sort((a, b) => a - b);
-        return {
-            owners: stepOwners,
-            targets: targetHits,
-            duration: totalDuration,
-            graphTargets: graphTargets,
-        };*/
     }
 
     applyComputeTargetHits() {
@@ -254,7 +264,7 @@ export class GameState {
     
     pause() {
         // when we pause, we want to set our variables to be right for unpause
-        if(!this.loopStart) {
+        if(!this.loopStart || this.paused) {
             return;
         }
         this.paused = true;
@@ -265,6 +275,9 @@ export class GameState {
     }
 
     unpause() {
+        if(!this.paused) {
+            return;
+        }
         if(this.loopStart) {
             this.loopStart = Date.now() - this.savedElapsed;
         }
@@ -272,6 +285,15 @@ export class GameState {
         this.savedElapsed = null;
         for(let graph of this.graphs) {
             graph.unpause(this.loopStart);
+        }
+    }
+
+    togglePause() {
+        if(this.paused) {
+            this.unpause();
+        }
+        else {
+            this.pause();
         }
     }
     
@@ -329,7 +351,7 @@ export class GameState {
         this.shadows = [];
         this.hits = this.total = 0;
         // this.loopCount = -1;
-        this.notePlayed = 0;
+        this.totalNotesPlayed = 0;
     }
     
     resetHitRecord() {
@@ -354,15 +376,7 @@ export class GameState {
             if(effect.newSides) {
                 // TODO: pause the screen for a bit?
                 // TODO: fix for cases other than growing
-                let lastHitRecord = this.hitRecord.at(0);
-                let lastHasPlayed = this.hasPlayed.at(0);
-                console.log("Before:", this.hitRecord);
                 this.graphs[i].setVertexCountNow(now, effect.newSides);
-                this.applyComputeTargetHits();
-                console.log("After:", this.hitRecord);
-                this.hitRecord[0] = lastHitRecord;
-                this.hasPlayed[0] = lastHasPlayed;
-                console.log("After fix:", this.hitRecord);
             }
         });
     }
@@ -383,19 +397,18 @@ export class GameState {
         let elapsedSinceStart = now - this.loopStart;
         // exile old shadows
         this.shadows = this.shadows.filter(shadow => now - shadow.born < 1250);
-        // apply notePlayed events
+        
+        // apply totalNotesPlayed events
         this.events = this.events.filter(event => {
-            if(this.notePlayed >= event?.condition?.notePlayed) {
+            if(this.totalNotesPlayed >= event?.condition?.totalNotesPlayed) {
                 if(event.effects) {
                     this.applyEventEffect(now, event.effects);
-                }
-                if(event.end) {
-                    this.transitionEnd();
                 }
                 return false;
             }
             return true;
         });
+
         if(this.finished) {
             return;
         }
@@ -423,11 +436,13 @@ export class GameState {
                         }
                         sm.play(hitSound);
                     }
-                    this.notePlayed++;
+                    this.totalNotesPlayed++;
+                    console.log("Note played: ", this.totalNotesPlayed);
                     this.hasPlayed[i] = true;
                 }
             }
         });
+
         // determine if song is over (same logic as if a note is too late to hit)
         let lastTiming = this.targets.at(-1);
         if(elapsedSinceStart > lastTiming + this.timings[HitState.Okay]) {
