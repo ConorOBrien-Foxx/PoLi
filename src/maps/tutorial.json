@@ -8,32 +8,29 @@
             "center": [350, 350],
             "radius": 105,
             "sides": 4,
-            "hitsound": ["c5", "e5", "b5", "g5"],
-            "loopDuration": 2000
+            "hitSound": ["c5", "e5", "b5", "g5"],
+            "loopDuration": 2000,
+            "hitNotes": [
+                0, 1, 2, 3, 4
+            ]
         }
     ],
     "events": [
         {
             "condition": {
-                "loopCount": 2
+                "notePlayed": 8
             },
             "effects": [
-                { "hitsound": ["c3", "e3", "b3", "g3"] }
+                { "hitSound": ["c3", "e3", "b3", "g3"] }
             ]
         },
         {
             "condition": {
-                "loopCount": 4
+                "notePlayed": 16
             },
             "effects": [
-                { "hitsound": ["c5", "e5", "b5", "g5"] }
+                { "hitSound": ["c5", "e5", "b5", "g5"] }
             ]
-        },
-        {
-            "condition": {
-                "loopCount": 6
-            },
-            "end": true
         }
     ]
 }

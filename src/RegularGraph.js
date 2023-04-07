@@ -1,13 +1,23 @@
 import { LogicTweener, FrameTweener } from "./TweenManager.js";
 
 export class RegularGraph {
-    constructor({ n, xc, yc, r, vertexChangeDelay, hitsound, loopDuration }) {
+    constructor({
+        n, xc, yc, r, vertexChangeDelay,
+        hitSound, loopDuration, hitNotes
+    }) {
+        // number of sides
         this.n = this.nextN = n;
+        // coordinates for the center
         this.xc = xc;
         this.yc = yc;
+        // visual radius of the shape
         this.r = r;
+        // notes that need to be hit
+        this.hitNotes = hitNotes;
+        // animation delay for tweening between vertices
         this.vertexChangeDelay = vertexChangeDelay;
-        this.hitsound = hitsound;
+        // initial sound the note plays
+        this.hitSound = hitSound;
         // how long a total cycle takes
         this.loopDuration = loopDuration;//ms
         // vertices of the main graph
@@ -49,8 +59,9 @@ export class RegularGraph {
             xc: json.center[0],
             yc: json.center[1],
             r: json.radius,
-            hitsound: json.hitsound,
+            hitSound: json.hitSound,
             loopDuration: json.loopDuration,
+            hitNotes: json.hitNotes,
         })
     }
     

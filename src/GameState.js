@@ -48,15 +48,18 @@ export class GameState {
         this.lastHit = null;
         // which events (if any) are present (sorted)
         this.events = [];
-        // various constants
-        this.hitsoundOffset = 0;
+        //* various constants *//
+        // internal note offset
+        // TODO: figure out if actually corresponds to typical sense of "offset"
+        this.hitSoundOffset = 0;
         // state
         this.stopped = true;
         this.paused = false;
         this.finished = false;
-        this.loopCount = -1; //-1 because we start before
+        // this.loopCount = -1; //-1 because we start before
         this.hits = 0;
         this.total = 0;
+        this.notePlayed = 0;
     }
 
     load(json) {
@@ -85,6 +88,32 @@ export class GameState {
     }
 
     computeTargetHits() {
+        const BEFORE_AFTER_PADDING = 1000;//ms
+        let stepOwners = {};
+        let hitTargets = [];
+        let duration = null;
+        let graphTargets = [];
+
+        // for now, assume 1 graph
+        let gdx = 0;
+        let graph = this.graphs[gdx];
+        let step = graph.loopDuration / graph.n;
+        let hits = graph.hitNotes.map(note => note * step);
+        for(let hit of hits) {
+            stepOwners[hit] ??= new Set();
+            stepOwners[hit].add(gdx);
+        }
+        hitTargets.push(...hits);
+        graphTargets.push(hits);
+        duration = Math.max(...hits) + BEFORE_AFTER_PADDING;
+        console.log(hitTargets);
+        return {
+            owners: stepOwners,
+            targets: hitTargets,
+            duration: duration,
+            graphTargets: graphTargets,
+        };
+        /*
         // compute the target hits for a single loop
         // TODO:
         let targetHits = [];
@@ -113,7 +142,7 @@ export class GameState {
             targets: targetHits,
             duration: totalDuration,
             graphTargets: graphTargets,
-        };
+        };*/
     }
 
     applyComputeTargetHits() {
@@ -166,6 +195,7 @@ export class GameState {
         let hitJudgment, hitTiming;
         this.targets.forEach((timing, i) => {
             if(isHit || isMiss || ignore) {
+                // TODO: break?
                 return;
             }
             let absDifference = Math.abs(timing - hitMarker);
@@ -245,6 +275,8 @@ export class GameState {
         }
     }
     
+    // TODO: make configurable via map settings, and/or
+    // depend on map speed
     countdown(n, rate=500) {
         return new Promise((resolve, reject) => {
             let step = n => {
@@ -296,10 +328,12 @@ export class GameState {
         }
         this.shadows = [];
         this.hits = this.total = 0;
-        this.loopCount = -1;
+        // this.loopCount = -1;
+        this.notePlayed = 0;
     }
     
     resetHitRecord() {
+        console.warn("Resetting hit record is deprecated");
         // copy over the last elements to the first (for wrapping around)
         let lastHitRecord = this.hitRecord.at(-1);
         let lastHasPlayed = this.hasPlayed.at(-1);
@@ -307,13 +341,14 @@ export class GameState {
         this.hitRecord[0] = lastHitRecord;
         this.hasPlayed = this.hasPlayed.map(() => false);
         this.hasPlayed[0] = lastHasPlayed;
-        this.loopCount++;
+        // this.loopCount++;
     }
 
     applyEventEffect(now, effects) {
         effects.forEach((effect, i) => {
-            if(effect.hitsound) {
-                this.graphs[i].hitsound = effect.hitsound;
+            if(effect.hitSound) {
+                console.log(this.graphs[i].hitSound, "->", effect.hitSound);
+                this.graphs[i].hitSound = effect.hitSound;
             }
             // TODO: what if newSides == 0? probably doesn't matter
             if(effect.newSides) {
@@ -332,6 +367,12 @@ export class GameState {
         });
     }
 
+    transitionEnd() {
+        if(this.finished) return;
+        console.log("Finishing!");
+        this.finished = true;
+    }
+
     step(now, elapsed) {
         if(!this.loopStart || this.paused || this.stopped) {
             return;
@@ -339,29 +380,25 @@ export class GameState {
         for(let graph of this.graphs) {
             graph.step(now, elapsed);
         }
-        // determine if we're resetting a loop
-        let elapsedSinceStart = (now - this.loopStart) % this.totalDuration;
-        if(this.lastElapsed > elapsedSinceStart) {
-            this.resetHitRecord();
-        }
+        let elapsedSinceStart = now - this.loopStart;
         // exile old shadows
         this.shadows = this.shadows.filter(shadow => now - shadow.born < 1250);
-        if(this.finished) return;
-        // apply loopCount events
+        // apply notePlayed events
         this.events = this.events.filter(event => {
-            if(this.loopCount >= event?.condition?.loopCount) {
+            if(this.notePlayed >= event?.condition?.notePlayed) {
                 if(event.effects) {
                     this.applyEventEffect(now, event.effects);
                 }
                 if(event.end) {
-                    // TODO: transition to end
-                    console.log("Finishing!");
-                    this.finished = true;
+                    this.transitionEnd();
                 }
                 return false;
             }
             return true;
         });
+        if(this.finished) {
+            return;
+        }
         // TODO: for some reason, you can still overhit notes and this messes up counters
         // determine if a note too late to hit
         this.lastElapsed = elapsedSinceStart;
@@ -376,19 +413,25 @@ export class GameState {
                 }
             }
             if(!this.hasPlayed[i]) {
-                if(timing + this.hitsoundOffset < elapsedSinceStart) {
+                if(timing + this.hitSoundOffset < elapsedSinceStart) {
                     let owners = this.stepOwners[timing];
                     for(let ownerIndex of owners) {
-                        let hitsound = this.graphs[ownerIndex].hitsound;
-                        if(Array.isArray(hitsound)) {
+                        let hitSound = this.graphs[ownerIndex].hitSound;
+                        if(Array.isArray(hitSound)) {
                             let soundIndex = this.graphTargets[ownerIndex].indexOf(timing);
-                            hitsound = hitsound[soundIndex];
+                            hitSound = hitSound[soundIndex % hitSound.length];
                         }
-                        sm.play(hitsound);
+                        sm.play(hitSound);
                     }
+                    this.notePlayed++;
                     this.hasPlayed[i] = true;
                 }
             }
         });
+        // determine if song is over (same logic as if a note is too late to hit)
+        let lastTiming = this.targets.at(-1);
+        if(elapsedSinceStart > lastTiming + this.timings[HitState.Okay]) {
+            this.transitionEnd();
+        }
     }
 }

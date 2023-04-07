@@ -59,7 +59,9 @@ export class SoundManager {
 
     play(name) {
         if(!this.sounds[name]) {
-            throw new Error(`Could not find sound with name '${name}'`);
+            // throw new Error(`Could not find sound with name '${name}'`);
+            console.warn(`Could not find a sound with name '${name}'`);
+            return;
         }
         let sound = this.sounds[name].find(sound => sound.paused);
         if(!sound) {

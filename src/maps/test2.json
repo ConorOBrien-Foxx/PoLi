@@ -7,28 +7,28 @@
             "center": [550, 250],
             "radius": 105,
             "sides": 3,
-            "hitsound": "c5",
+            "hitSound": "c5",
             "loopDuration": 4000
         },
         {
             "center": [550, 450],
             "radius": 125,
             "sides": 4,
-            "hitsound": "e4",
+            "hitSound": "e4",
             "loopDuration": 4000
         },
         {
             "center": [150, 250],
             "radius": 95,
             "sides": 6,
-            "hitsound": "f5",
+            "hitSound": "f5",
             "loopDuration": 4000
         },
         {
             "center": [150, 450],
             "radius": 85,
             "sides": 8,
-            "hitsound": "g5",
+            "hitSound": "g5",
             "loopDuration": 4000
         }
     ],

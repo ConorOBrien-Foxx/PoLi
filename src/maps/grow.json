@@ -8,7 +8,7 @@
             "center": [350, 350],
             "radius": 105,
             "sides": 2,
-            "hitsound": "c5",
+            "hitSound": "c5",
             "loopDuration": 3000
         }
     ],
@@ -19,7 +19,7 @@
             },
             "effects": [
                 {
-                    "hitsound": "e5",
+                    "hitSound": "e5",
                     "newSides": 3
                 }
             ]
@@ -30,7 +30,7 @@
             },
             "effects": [
                 {
-                    "hitsound": "f5",
+                    "hitSound": "f5",
                     "newSides": 4
                 }
             ]
@@ -41,7 +41,7 @@
             },
             "effects": [
                 {
-                    "hitsound": "g5",
+                    "hitSound": "g5",
                     "newSides": 5
                 }
             ]
@@ -52,7 +52,7 @@
             },
             "effects": [
                 {
-                    "hitsound": "f5",
+                    "hitSound": "f5",
                     "newSides": 4
                 }
             ]
@@ -63,7 +63,7 @@
             },
             "effects": [
                 {
-                    "hitsound": "e5",
+                    "hitSound": "e5",
                     "newSides": 3
                 }
             ]
@@ -74,7 +74,7 @@
             },
             "effects": [
                 {
-                    "hitsound": "c5",
+                    "hitSound": "c5",
                     "newSides": 2
                 }
             ]

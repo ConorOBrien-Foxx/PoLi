@@ -124,7 +124,7 @@ window.addEventListener("load", async function() {
         // map3,
     ];
 
-    gm.state.load(map1);
+    // gm.state.load(map1);
 
     let now, elapsed;
     const gameLoop = (/*timeStamp*/) => {
