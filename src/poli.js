@@ -110,7 +110,7 @@ window.addEventListener("load", async function() {
     });
     window.gm=gm;//debugging
 
-    let map1 = await readJSON("./src/maps/test1.json");
+    let basic34 = await readJSON("./src/maps/basic3-4.json");
     // let map2 = await readJSON("./src/maps/test2.json");
     // let map3 = await readJSON("./src/maps/test3.json");
     let tutorial = await readJSON("./src/maps/tutorial.json");
@@ -121,8 +121,8 @@ window.addEventListener("load", async function() {
         tutorial,
         grow,
         grow2,
-        map1,
-        tri,
+        basic34,
+        // tri,
         // map2,
         // map3,
     ];
@@ -178,9 +178,11 @@ window.addEventListener("load", async function() {
     document.getElementById("startThreeFour").addEventListener("click", function () {
         startLevel(3);
     });
+    /*
     document.getElementById("startTri").addEventListener("click", function () {
-        startLevel(43);
+        startLevel(4);
     });
+    */
 
     // TODO: check ancestors?
     const isInputTarget = el =>

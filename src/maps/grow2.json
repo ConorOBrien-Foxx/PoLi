@@ -1,6 +1,6 @@
 {
     "name": "Even More Growing Vertices",
-    "vertexAnimate": 200,
+    "vertexAnimate": 150,
     "difficulty": 5,
     "track": "track",
     "graphs": [

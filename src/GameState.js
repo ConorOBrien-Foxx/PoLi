@@ -136,16 +136,18 @@ export class GameState {
             }
             hitTargets.push(...hits);
             graphTargets.push(hits);
-            duration = Math.max(...hits) + BEFORE_AFTER_PADDING;
-            console.log(hitTargets);
+            console.log(hits);
         });
+        duration = Math.max(...hitTargets) + BEFORE_AFTER_PADDING;
 
         // TODO: we can probably use insertion sort
         // hitTargets.push(totalDuration);
         // stepOwners[totalDuration] = new Set(this.graphs.map((_, i) => i));
         // deduplicate
+        console.log("Before dedup:", hitTargets);
         hitTargets = [...new Set(hitTargets)];
         hitTargets.sort((a, b) => a - b);
+        console.log("After dedup:", hitTargets);
 
         return {
             owners: stepOwners,
